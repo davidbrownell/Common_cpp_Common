@@ -11,3 +11,6 @@ Activate.sh
 
 .coverage
 coverage.xml
+
+Tools/cmake/v3.13.4/Windows/*
+Tools/cmake/v3.13.4/Linux/*
