@@ -148,12 +148,28 @@ def GetCustomActions(debug, verbose, explicit_configurations):
 
     actions = []
 
-    for tool in ["cmake"]:
-        for version in ["v3.13.4"]:
-            for operating_system, hash in [
-                ("Windows", "CFB94E2E356F1E0CF8574B345798410BA1B98C3F5B8F8D568E87879811C2A9F1"),
-                ("Linux", "B786120D2D1741ABFF9E2E69B7B94139216CA800559F28707522658568CCB98F"),
-            ]:
+    for tool, version_infos in [
+        (
+            "cmake",
+            [
+                (
+                    "v3.13.4",
+                    [("Windows", "CFB94E2E356F1E0CF8574B345798410BA1B98C3F5B8F8D568E87879811C2A9F1"), ("Linux", "B786120D2D1741ABFF9E2E69B7B94139216CA800559F28707522658568CCB98F")],
+                ),
+            ],
+        ),
+        (
+            "ninja",
+            [
+                (
+                    "v1.9.0",
+                    [("Windows", "4594F25878EC07BC25795BA27DEF1F83D8F3D2B5FF62335A0F1A25154407384D"), ("Linux", "D53ACC6579E21FC5B36BA923C758F1B53C85B0177765F014C43B9B4B48E7166E")],
+                ),
+            ],
+        ),
+    ]:
+        for version, operating_system_infos in version_infos:
+            for operating_system, hash in operating_system_infos:
                 if CurrentShell.CategoryName != operating_system:
                     continue
 
