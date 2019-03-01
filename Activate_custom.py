@@ -54,55 +54,64 @@ def GetCustomActions(
 
     actions = []
 
-    for tool, version_infos in [
-        (
-            "cmake",
-            [
-                (
-                    "v3.13.4",
-                    [("Windows", "CFB94E2E356F1E0CF8574B345798410BA1B98C3F5B8F8D568E87879811C2A9F1"), ("Linux", "B786120D2D1741ABFF9E2E69B7B94139216CA800559F28707522658568CCB98F")],
-                ),
-            ],
-        ),
-        (
-            "ninja",
-            [
-                (
-                    "v1.9.0",
-                    [("Windows", "4594F25878EC07BC25795BA27DEF1F83D8F3D2B5FF62335A0F1A25154407384D"), ("Linux", "D53ACC6579E21FC5B36BA923C758F1B53C85B0177765F014C43B9B4B48E7166E")],
-                ),
-            ],
-        ),
-    ]:
-        for version, operating_system_infos in version_infos:
-            for operating_system, hash in operating_system_infos:
-                if CurrentShell.CategoryName != operating_system:
-                    continue
+    if fast:
+        actions.append(CurrentShell.Commands.Message("** FAST: Activating without verifying content. ({})".format(_script_fullpath)))
+    else:
+        for tool, version_infos in [
+            (
+                "cmake",
+                [
+                    (
+                        "v3.13.4",
+                        [
+                            ("Windows", "CFB94E2E356F1E0CF8574B345798410BA1B98C3F5B8F8D568E87879811C2A9F1"),
+                            ("Linux", "B786120D2D1741ABFF9E2E69B7B94139216CA800559F28707522658568CCB98F"),
+                        ],
+                    )
+                ],
+            ),
+            (
+                "ninja",
+                [
+                    (
+                        "v1.9.0",
+                        [
+                            ("Windows", "4594F25878EC07BC25795BA27DEF1F83D8F3D2B5FF62335A0F1A25154407384D"),
+                            ("Linux", "D53ACC6579E21FC5B36BA923C758F1B53C85B0177765F014C43B9B4B48E7166E"),
+                        ],
+                    )
+                ],
+            ),
+        ]:
+            for version, operating_system_infos in version_infos:
+                for operating_system, hash in operating_system_infos:
+                    if CurrentShell.CategoryName != operating_system:
+                        continue
 
-                tool_dir = os.path.join(_script_dir, "Tools", tool, version, operating_system)
-                assert os.path.isdir(tool_dir), tool_dir
+                    tool_dir = os.path.join(_script_dir, "Tools", tool, version, operating_system)
+                    assert os.path.isdir(tool_dir), tool_dir
 
-                if not actions:
-                    actions.append(CurrentShell.Commands.Message(""))
+                    if not actions:
+                        actions.append(CurrentShell.Commands.Message(""))
 
-                actions.append(
-                    CurrentShell.Commands.Call(
-                        'python "{script}" Verify "{tool} - {version}" "{dir}" {hash}'.format(
-                            script=os.path.join(
-                                os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL"),
-                                "RepositoryBootstrap",
-                                "SetupAndActivate",
-                                "AcquireBinaries.py",
+                    actions.append(
+                        CurrentShell.Commands.Call(
+                            'python "{script}" Verify "{tool} - {version}" "{dir}" {hash}'.format(
+                                script=os.path.join(
+                                    os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL"),
+                                    "RepositoryBootstrap",
+                                    "SetupAndActivate",
+                                    "AcquireBinaries.py",
+                                ),
+                                tool=tool,
+                                version=version,
+                                dir=tool_dir,
+                                hash=hash,
                             ),
-                            tool=tool,
-                            version=version,
-                            dir=tool_dir,
-                            hash=hash,
                         ),
-                    ),
-                )
+                    )
 
-        actions.append(CurrentShell.Commands.Message(""))
+            actions.append(CurrentShell.Commands.Message(""))
 
     return actions
 
