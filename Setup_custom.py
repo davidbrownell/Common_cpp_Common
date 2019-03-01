@@ -103,14 +103,14 @@ def GetDependencies():
                     "x64",
                     [
                         Dependency(
-                            "0EAA1DCF22804F90AD9F5A3B85A5D706",                           # Id for Common_Environment; found in <Common_Environment>/__RepositoryId__
-                            "Common_Environment",                                         # Name used if Common_Environment cannot be found during setup
-                            "python36",                                                   # Configuration value used when activating Common_Environment (can be None or skipped for repos that only support a single configuration)
+                            "0EAA1DCF22804F90AD9F5A3B85A5D706",                                                     # Id for Common_Environment; found in <Common_Environment>/__RepositoryId__
+                            "Common_Environment",                                                                   # Name used if Common_Environment cannot be found during setup
+                            "python36",                                                                             # Configuration value used when activating Common_Environment (can be None or skipped for repos that only support a single configuration)
                             lambda scm_or_none: "https://github.com/davidbrownell/Common_cpp_Common.git"
                             if scm_or_none is None or scm_or_none.Name != "Mercurial"
                             else "ssh://{mercurial_ssh_config_name}/d:/Mercurial/Code/v3/Common/Common_cpp_Common", # Uri for repo; can be string or def Func(scm_or_none) -> string
                         ),
-                                                                                          # Other dependencies go here (if any)
+                                                                                                                    # Other dependencies go here (if any)
                     ],
                 ),
             ),
@@ -120,18 +120,18 @@ def GetDependencies():
                     "x86",
                     [
                         Dependency(
-                            "0EAA1DCF22804F90AD9F5A3B85A5D706",                           # Id for Common_Environment; found in <Common_Environment>/__RepositoryId__
-                            "Common_Environment",                                         # Name used if Common_Environment cannot be found during setup
-                            "python36",                                                   # Configuration value used when activating Common_Environment (can be None or skipped for repos that only support a single configuration)
+                            "0EAA1DCF22804F90AD9F5A3B85A5D706",                                                     # Id for Common_Environment; found in <Common_Environment>/__RepositoryId__
+                            "Common_Environment",                                                                   # Name used if Common_Environment cannot be found during setup
+                            "python36",                                                                             # Configuration value used when activating Common_Environment (can be None or skipped for repos that only support a single configuration)
                             lambda scm_or_none: "https://github.com/davidbrownell/Common_cpp_Common.git"
                             if scm_or_none is None or scm_or_none.Name != "Mercurial"
                             else "ssh://{mercurial_ssh_config_name}/d:/Mercurial/Code/v3/Common/Common_cpp_Common", # Uri for repo; can be string or def Func(scm_or_none) -> string
                         ),
-                                                                                          # Other dependencies go here (if any)
+                                                                                                                    # Other dependencies go here (if any)
                     ],
                 ),
             ),
-        ]
+        ],
     )
 
 
@@ -145,5 +145,55 @@ def GetCustomActions(debug, verbose, explicit_configurations):
     that are converted into statements appropriate for the current scripting language (in most
     cases, this is Bash on Linux systems and Batch or PowerShell on Windows systems.
     """
-    
-    return []
+
+    actions = []
+
+    for tool, version_infos in [
+        (
+            "cmake",
+            [
+                (
+                    "v3.13.4",
+                    [("Windows", "CFB94E2E356F1E0CF8574B345798410BA1B98C3F5B8F8D568E87879811C2A9F1"), ("Linux", "B786120D2D1741ABFF9E2E69B7B94139216CA800559F28707522658568CCB98F")],
+                ),
+            ],
+        ),
+        (
+            "ninja",
+            [
+                (
+                    "v1.9.0",
+                    [("Windows", "4594F25878EC07BC25795BA27DEF1F83D8F3D2B5FF62335A0F1A25154407384D"), ("Linux", "D53ACC6579E21FC5B36BA923C758F1B53C85B0177765F014C43B9B4B48E7166E")],
+                ),
+            ],
+        ),
+    ]:
+        for version, operating_system_infos in version_infos:
+            for operating_system, hash in operating_system_infos:
+                if CurrentShell.CategoryName != operating_system:
+                    continue
+
+                tool_dir = os.path.join(_script_dir, "Tools", tool, version, operating_system)
+                assert os.path.isdir(tool_dir), tool_dir
+
+                actions.append(
+                    CurrentShell.Commands.Call(
+                        'python "{script}" Install "{tool} - {version}" "{uri}" "{dir}" {hash}'.format(
+                            script=os.path.join(
+                                os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL"),
+                                "RepositoryBootstrap",
+                                "SetupAndActivate",
+                                "AcquireBinaries.py",
+                            ),
+                            tool=tool,
+                            version=version,
+                            uri=CommonEnvironmentImports.FileSystem.FilenameToUri(
+                                os.path.join(tool_dir, "Install.7z"),
+                            ),
+                            dir=tool_dir,
+                            hash=hash,
+                        ),
+                    ),
+                )
+
+    return actions
