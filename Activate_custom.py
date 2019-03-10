@@ -17,9 +17,12 @@
 import os
 import sys
 
-sys.path.insert(0, os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL"))
-from RepositoryBootstrap.SetupAndActivate import CommonEnvironment, CurrentShell
+from collections import OrderedDict
 
+sys.path.insert(0, os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL"))
+from RepositoryBootstrap import Constants as RepositoryBootstrapConstants
+from RepositoryBootstrap.SetupAndActivate import CommonEnvironment, CurrentShell
+from RepositoryBootstrap.Impl.ActivationActivity import ActivationActivity
 del sys.path[0]
 
 # ----------------------------------------------------------------------
@@ -113,6 +116,32 @@ def GetCustomActions(
 
             actions.append(CurrentShell.Commands.Message(""))
 
+    # Get the cmake path
+    cmake_dirs = []
+
+    version_info = version_specs.Libraries.get("cmake", {})
+
+    for repository in repositories:
+        for directory in _EnumLibraryDependencies("cmake", repository.Root, version_info):
+            cmake_dirs.append(directory.replace("\\", "\\\\"))
+
+    actions.append(CurrentShell.Commands.Augment("DEVELOPMENT_ENVIRONMENT_CMAKE_MODULE_PATH", cmake_dirs))
+
+    # Load all libraries
+    includes = []
+
+    version_info = version_specs.Libraries.get("C++", {})
+
+    for repository in repositories:
+        for directory in _EnumLibraryDependencies("C++", repository.Root, version_info):
+            potential_include = os.path.join(directory, "include")
+            if os.path.isdir(potential_include):
+                includes.append(potential_include)
+            else:
+                includes.append(directory)
+
+    actions.append(CurrentShell.Commands.Augment("INCLUDE", includes))
+
     return actions
 
 
@@ -157,3 +186,21 @@ def GetCustomScriptExtractors():
     """
 
     return
+
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+def _EnumLibraryDependencies(type, root, version_info):
+    library_fullpath = os.path.join(root, RepositoryBootstrapConstants.LIBRARIES_SUBDIR, type)
+    if not os.path.isdir(library_fullpath):
+        return
+
+    for name in os.listdir(library_fullpath):
+        fullpath = os.path.join(library_fullpath, name)
+        if not os.path.isdir(fullpath):
+            continue
+
+        value = ActivationActivity.GetVersionedDirectory(version_info, fullpath)
+        assert os.path.isdir(value), value
+
+        yield value
