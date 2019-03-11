@@ -123,7 +123,7 @@ def GetCustomActions(
 
     for repository in repositories:
         for directory in _EnumLibraryDependencies("cmake", repository.Root, version_info):
-            cmake_dirs.append(directory.replace("\\", "\\\\"))
+            cmake_dirs.append(directory.replace("\\", "/"))
 
     actions.append(CurrentShell.Commands.Augment("DEVELOPMENT_ENVIRONMENT_CMAKE_MODULE_PATH", cmake_dirs))
 
