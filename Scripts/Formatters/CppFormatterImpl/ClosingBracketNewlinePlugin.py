@@ -22,13 +22,14 @@ import six
 import CommonEnvironment
 from CommonEnvironment import Interface
 
-from CommonCppCommon.clang_formatAndBrown.Plugins import Plugin as PluginBase
-
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
 _script_dir, _script_name                   = os.path.split(_script_fullpath)
 #  ----------------------------------------------------------------------
 
+# This is available because it is imported in CppFormatter.py
+from CppFormatterImpl import PluginBase
+         
 # ----------------------------------------------------------------------
 @Interface.staticderived
 class Plugin(PluginBase):

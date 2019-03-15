@@ -22,6 +22,7 @@ from collections import OrderedDict
 sys.path.insert(0, os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL"))
 from RepositoryBootstrap import Constants as RepositoryBootstrapConstants
 from RepositoryBootstrap.SetupAndActivate import CommonEnvironment, CurrentShell
+from RepositoryBootstrap.SetupAndActivate import DynamicPluginArchitecture
 from RepositoryBootstrap.Impl.ActivationActivity import ActivationActivity
 del sys.path[0]
 
@@ -141,6 +142,13 @@ def GetCustomActions(
                 includes.append(directory)
 
     actions.append(CurrentShell.Commands.Augment("INCLUDE", includes))
+
+    # Add the formatter
+    actions += DynamicPluginArchitecture.CreateRegistrationStatements(
+        "DEVELOPMENT_ENVIRONMENT_FORMATTERS",
+        os.path.join(_script_dir, "Scripts", "Formatters"),
+        lambda fullpath, name, ext: ext == ".py" and name.endswith("Formatter"),
+    )
 
     return actions
 
