@@ -98,7 +98,8 @@ def Build(
 def Clean(
     output_stream=sys.stdout,
 ):
-    raise Exception("Clean shouldn't be invoked")
+    output_stream.write("Clean functionality is not enabled for this build.\n")
+    return 0
 
 
 # ----------------------------------------------------------------------
