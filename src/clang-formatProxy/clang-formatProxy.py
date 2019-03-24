@@ -87,10 +87,14 @@ def EntryPoint(
 
     with CallOnExit(lambda: FileSystem.RemoveFile(temp_filename)):
         # Invoke the script
-        command_line = '"{script}" Format "{filename}" /quiet "/hint_filename={original_filename}"'.format(
-            script=CurrentShell.CreateScriptName("Formatter"),
+        script_name = "Formatter"
+        if CurrentShell.CategoryName != "Linux":
+            script_name = CurrentShell.CreateScriptName(script_name)
+
+        command_line = '"{script}" Format "{filename}" /quiet "/plugin_arg=hint_filename:{original_filename}"'.format(
+            script=script_name,
             filename=temp_filename,
-            original_filename=input_filename,
+            original_filename=input_filename.replace(":", "\\:"),
         )
 
         result, formatted_output = Process.Execute(command_line)

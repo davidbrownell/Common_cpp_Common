@@ -46,6 +46,12 @@ option(
     "OFF"
 )
 
+option(
+    PREPROCESSOR_OUTPUT
+    "Generate preprocessor output"
+    "OFF"
+)
+
 # CMAKE_CONFIGURATION_TYPES
 set(_valid_configuration_types 
     Debug                                   # Standard Debug build
@@ -214,7 +220,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
 
     # CODE_COVERAGE
     set(_local_CXX_flags_CODE_COVERAGE_FALSE "")
-    set(_CMAKE_FLAGS_CODE_COVERAGE_FALSE "")
     foreach(_flag IN ITEMS
         /Zc:inline                          # remove unreferenced function or data if it is COMDAT or has internal linkage only
     )
@@ -226,6 +231,10 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     set(_local_CXX_flags_NO_DEBUG_INFO_FALSE_RELEASE "/Zi")
     set(_local_CXX_flags_NO_DEBUG_INFO_FALSE_RELEASEMINSIZE "${_local_CXX_flags_NO_DEBUG_INFO_FALSE_RELEASE}")
     set(_local_CXX_flags_NO_DEBUG_INFO_FALSE_RELEASENOOPT "${_local_CXX_flags_NO_DEBUG_INFO_FALSE_RELEASE}")
+
+    # PREPROCESSOR_OUTPUT
+    set(_local_CXX_flags_PREPROCESSOR_OUTPUT_FALSE "")
+    set(_local_CXX_flags_PREPROCESSOR_OUTPUT_TRUE "/P")
 
     # ----------------------------------------------------------------------
     # |
@@ -255,7 +264,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
 
     set(_local_EXE_LINKER_flags_release "")
     foreach(_flag IN ITEMS 
-        /LTCG:incremental                   # Link-time code generation (only files that have changed)
+        /LTCG                               # Link-time code generation
         /INCREMENTAL:NO                     # Do not leverage incremental linking
         /OPT:ICF                            # Enable COMDAT Folding
         /OPT:REF                            # References
@@ -348,6 +357,7 @@ foreach(_flag_prefix IN ITEMS
         STATIC_CRT
         CODE_COVERAGE
         NO_DEBUG_INFO
+        PREPROCESSOR_OUTPUT
     )
         set(_local_flag_name "_local_${_flag_prefix}_flags_${_flag_type}")
         if(DEFINED "${_local_flag_name}")
@@ -401,6 +411,7 @@ foreach(_flag_prefix IN ITEMS
         STATIC_CRT
         CODE_COVERAGE
         NO_DEBUG_INFO
+        PREPROCESSOR_OUTPUT
     )
         set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}")
         if(DEFINED "${_cached_flag_name}")
