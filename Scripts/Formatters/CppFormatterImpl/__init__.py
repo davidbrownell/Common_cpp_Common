@@ -29,6 +29,36 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 # ----------------------------------------------------------------------
 class PluginBase(FormatterPluginBase):
     # ----------------------------------------------------------------------
+    # |  Types
+    class Line(object):
+        # ----------------------------------------------------------------------
+        def __init__(
+            self,
+            content,
+            continuation_block_id=None,
+        ):
+            self.content                    = content
+            self.continuation_block_id      = continuation_block_id
+            
+        # ----------------------------------------------------------------------
+        def __repr__(self):
+            return CommonEnvironment.ObjectReprImpl(self)
+
+        # ----------------------------------------------------------------------
+        def Clone(
+            self,
+            new_line_content,
+            current_line_content=None,
+        ):
+            if current_line_content is not None:
+                self.content = current_line_content
+
+            return self.__class__(
+                new_line_content,
+                continuation_block_id=self.continuation_block_id,
+            )
+
+    # ----------------------------------------------------------------------
     # |  Protected Methods
     @classmethod
     def EnumerateLines(cls, lines):

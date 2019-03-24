@@ -77,7 +77,7 @@ class Plugin(PluginBase):
         )
 
         for line_index, line in enumerate(lines):
-            sys.stdout.write("{0:>3}) {1}\n".format(index_index + 1, line))
+            sys.stdout.write("{0:>3}) {1}\n".format(line_index + 1, line))
 
         sys.stdout.write("\n")
 
