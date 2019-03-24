@@ -177,7 +177,7 @@ def GetCustomActions(debug, verbose, explicit_configurations):
                 assert os.path.isdir(tool_dir), tool_dir
 
                 actions.append(
-                    CurrentShell.Commands.Call(
+                    CurrentShell.Commands.Execute(
                         'python "{script}" Install "{tool} - {version}" "{uri}" "{dir}" {hash}'.format(
                             script=os.path.join(
                                 os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL"),

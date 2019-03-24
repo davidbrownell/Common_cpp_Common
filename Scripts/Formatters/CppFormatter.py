@@ -154,9 +154,33 @@ class Formatter(FormatterImpl):
                 ).format(result, StringHelpers.LeftJustify(output, 4)),
             )
 
-        # Decorate the lines
-        lines = output.split("\n")
+        # Convert the lines into line structures
+        lines = []
+        continuation_block_index = 0
+        continuation_block_id = None
+
+        for line_content in output.split("\n"):
+            has_continuation_token = False
+
+            if line_content.endswith("\\"):
+                if continuation_block_id is None:
+                    continuation_block_id = continuation_block_index
+                    continuation_block_index += 1
+
+                has_continuation_token = True
+                line_content = line_content[:-1].rstrip()
+
+            line = PluginBase.Line(
+                line_content,
+                continuation_block_id=continuation_block_id,
+            )
+
+            if not has_continuation_token:
+                continuation_block_id = None
+
+            lines.append(line)
         
+        # Decorate the lines
         for plugin in plugins:
             args = []
             kwargs = {}
@@ -176,6 +200,35 @@ class Formatter(FormatterImpl):
         for plugin in plugins:
             lines = plugin.PostprocessLines(lines)
 
-        output = "\n".join(lines)
+        # Restore the line continuation chars
+        output = []
+        continuation_block_id = None
+
+        for line_index, line in enumerate(lines):
+            # Add continuation chars
+            if line.continuation_block_id is not None and line.continuation_block_id != continuation_block_id:
+                continuation_block_id = line.continuation_block_id
+
+                # Process all the lines in this block
+                max_line_length = 0
+                end_block_index = line_index
+
+                while end_block_index < len(lines) and lines[end_block_index].continuation_block_id == continuation_block_id:
+                    max_line_length = max(max_line_length, len(lines[end_block_index].content))
+                    end_block_index += 1
+
+                max_line_length += 2
+
+                index = line_index
+                while index < end_block_index:
+                    if index + 1 == end_block_index:
+                        suffix = ""
+                    else:
+                        suffix = "{}\\".format(" " * (max_line_length - len(lines[index].content)))
+
+                    lines[index].content = "{}{}".format(lines[index].content, suffix)
+                    index += 1
+
+        output = "\n".join([line.content for line in lines])
 
         return output, output != input_content

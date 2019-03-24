@@ -61,9 +61,9 @@ class Plugin(PluginBase):
 
             current_line_index = opening_line_index + 1
             while current_line_index < len(lines):
-                current_line = lines[current_line_index]
+                current_line_content = lines[current_line_index].content
 
-                for char_index, char in enumerate(current_line):
+                for char_index, char in enumerate(current_line_content):
                     if char == opening:
                         bracket_counter += 1
                     elif char == closing:
@@ -71,18 +71,20 @@ class Plugin(PluginBase):
 
                         if bracket_counter == 0:
                             # Get the whitespace associated with the opening line
-                            opening_line = lines[opening_line_index]
+                            opening_line_content = lines[opening_line_index].content
 
                             whitespace_index = 0
-                            while whitespace_index < len(opening_line) and opening_line[whitespace_index].isspace(
+                            while whitespace_index < len(opening_line_content) and opening_line_content[whitespace_index].isspace(
                             ):
                                 whitespace_index += 1
 
                             # Update the line
-                            lines[current_line_index] = "{}\n{}{}".format(
-                                current_line[:char_index],
-                                opening_line[:whitespace_index],
-                                current_line[char_index:],
+                            lines.insert(
+                                current_line_index + 1,
+                                lines[current_line_index].Clone(
+                                    "{}{}".format(opening_line_content[:whitespace_index], current_line_content[char_index:]),
+                                    current_line_content=current_line_content[:char_index],
+                                ),
                             )
                             return
 
@@ -90,12 +92,16 @@ class Plugin(PluginBase):
 
         # ----------------------------------------------------------------------
 
-        for line_index, line in cls.EnumerateLines(lines):
-            line = line.rstrip()
-
+        line_index = 0
+        
+        while line_index < len(lines):
+            line = lines[line_index].content.rstrip()
+            
             for opening, closing in six.iteritems(brackets):
                 if line.endswith(opening):
                     UpdateClosingBracket(line_index, opening, closing)
                     break
+
+            line_index += 1
 
         return lines

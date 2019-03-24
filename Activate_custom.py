@@ -99,7 +99,7 @@ def GetCustomActions(
                         actions.append(CurrentShell.Commands.Message(""))
 
                     actions.append(
-                        CurrentShell.Commands.Call(
+                        CurrentShell.Commands.Execute(
                             'python "{script}" Verify "{tool} - {version}" "{dir}" {hash}'.format(
                                 script=os.path.join(
                                     os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL"),
@@ -142,6 +142,15 @@ def GetCustomActions(
                 includes.append(directory)
 
     actions.append(CurrentShell.Commands.Augment("INCLUDE", includes))
+
+    # Add the architecture
+    actions.append(
+        CurrentShell.Commands.Set(
+            "DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE",
+            configuration,
+            update_memory=True,
+        ),
+    )
 
     # Add the formatter
     actions += DynamicPluginArchitecture.CreateRegistrationStatements(
