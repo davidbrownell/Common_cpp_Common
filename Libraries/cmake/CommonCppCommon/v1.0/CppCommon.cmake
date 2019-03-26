@@ -17,38 +17,44 @@ cmake_minimum_required(VERSION 3.5)
 cmake_policy(SET CMP0057 NEW)
 
 option(
-    FORCE_CMAKE_FLAG_GENERATION
+    CppCommon_FORCE_CMAKE_FLAG_GENERATION
     "Force the repopulation of CMAKE flags, overwriting any changes made after a previous generation."
     "OFF"
 )
 
 option(
-    UNICODE
+    CppCommon_UNICODE
     "Use the unicode character set (default is mutli-byte (best practice is to leverage UTF-8))."
     "OFF"
 )
 
 option(
-    STATIC_CRT
-    "Statically link with the CRT (default is to dynamically linkage)."
+    CppCommon_STATIC_CRT
+    "Statically link with the CRT (default is dynamic linkage)."
     "OFF"
 )
 
 option(
-    CODE_COVERAGE
+    CppCommon_CODE_COVERAGE
     "Produce builds that can be used when extracting code coverage information (requires a Debug build)."
     "OFF"
 )
 
 option(
-    NO_DEBUG_INFO
+    CppCommon_NO_DEBUG_INFO
     "Do not generate debug info for the build (this is not recommended)"
     "OFF"
 )
 
 option(
-    PREPROCESSOR_OUTPUT
+    CppCommon_PREPROCESSOR_OUTPUT
     "Generate preprocessor output"
+    "OFF"
+)
+
+option(
+    CppCommon_CMAKE_DEBUG
+    "Generates cmake debug output"
     "OFF"
 )
 
@@ -62,7 +68,7 @@ set(_valid_configuration_types
 
 if(NOT CMAKE_CONFIGURATION_TYPES)
     # Note the following changes from standard cmake:
-    #   - `RelWithDebugInfo` has been removed (as it is redundant with the `NO_DEBUG_INFO` flag)
+    #   - `RelWithDebugInfo` has been removed (as it is redundant with the `CppCommon_NO_DEBUG_INFO` flag)
     #   - `MinSizeRel` has been renamed `ReleaseMinSize` (for consistency)
     #   - `ReleaseNoOpt` has been added
     #
@@ -203,38 +209,38 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     # ----------------------------------------------------------------------
     # |  Dynamic Flags
     
-    # UNICODE
-    set(_local_CXX_flags_UNICODE_TRUE "/DUNICODE /D_UNICODE")
-    set(_local_CXX_flags_UNICODE_FALSE "/DMBCS /D_MBCS")
+    # CppCommon_UNICODE
+    set(_local_CXX_flags_CppCommon_UNICODE_TRUE "/DUNICODE /D_UNICODE")
+    set(_local_CXX_flags_CppCommon_UNICODE_FALSE "/DMBCS /D_MBCS")
 
-    # STATIC_CRT
-    set(_local_CXX_flags_STATIC_CRT_TRUE_DEBUG "/MTd")
-    set(_local_CXX_flags_STATIC_CRT_TRUE_RELEASE "/MT")
-    set(_local_CXX_flags_STATIC_CRT_TRUE_RELEASEMINSIZE "${_local_CXX_flags_STATIC_CRT_TRUE_RELEASE}")
-    set(_local_CXX_flags_STATIC_CRT_TRUE_RELEASENOOPT "${_local_CXX_flags_STATIC_CRT_TRUE_RELEASE}")
+    # CppCommon_STATIC_CRT
+    set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_DEBUG "/MTd")
+    set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASE "/MT")
+    set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASEMINSIZE "${_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASE}")
+    set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASENOOPT "${_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASE}")
 
-    set(_local_CXX_flags_STATIC_CRT_FALSE_DEBUG "/MDd")
-    set(_local_CXX_flags_STATIC_CRT_FALSE_RELEASE "/MD")
-    set(_local_CXX_flags_STATIC_CRT_FALSE_RELEASEMINSIZE "${_local_CXX_flags_STATIC_CRT_FALSE_RELEASE}")
-    set(_local_CXX_flags_STATIC_CRT_FALSE_RELEASENOOPT "${_local_CXX_flags_STATIC_CRT_FALSE_RELEASE}")
+    set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_DEBUG "/MDd")
+    set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASE "/MD")
+    set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASEMINSIZE "${_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASE}")
+    set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASENOOPT "${_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASE}")
 
-    # CODE_COVERAGE
-    set(_local_CXX_flags_CODE_COVERAGE_FALSE "")
+    # CppCommon_CODE_COVERAGE
+    set(_local_CXX_flags_CppCommon_CODE_COVERAGE_FALSE "")
     foreach(_flag IN ITEMS
         /Zc:inline                          # remove unreferenced function or data if it is COMDAT or has internal linkage only
     )
-        string(APPEND _local_CXX_flags_CODE_COVERAGE_FALSE " ${_flag}")
+        string(APPEND _local_CXX_flags_CppCommon_CODE_COVERAGE_FALSE " ${_flag}")
     endforeach()
     
-    # NO_DEBUG_INFO
-    set(_local_CXX_flags_NO_DEBUG_INFO_FALSE_DEBUG "/ZI")
-    set(_local_CXX_flags_NO_DEBUG_INFO_FALSE_RELEASE "/Zi")
-    set(_local_CXX_flags_NO_DEBUG_INFO_FALSE_RELEASEMINSIZE "${_local_CXX_flags_NO_DEBUG_INFO_FALSE_RELEASE}")
-    set(_local_CXX_flags_NO_DEBUG_INFO_FALSE_RELEASENOOPT "${_local_CXX_flags_NO_DEBUG_INFO_FALSE_RELEASE}")
+    # CppCommon_NO_DEBUG_INFO
+    set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_DEBUG "/ZI")
+    set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASE "/Zi")
+    set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASEMINSIZE "${_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASE}")
+    set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASENOOPT "${_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASE}")
 
-    # PREPROCESSOR_OUTPUT
-    set(_local_CXX_flags_PREPROCESSOR_OUTPUT_FALSE "")
-    set(_local_CXX_flags_PREPROCESSOR_OUTPUT_TRUE "/P")
+    # CppCommon_PREPROCESSOR_OUTPUT
+    set(_local_CXX_flags_CppCommon_PREPROCESSOR_OUTPUT_FALSE "")
+    set(_local_CXX_flags_CppCommon_PREPROCESSOR_OUTPUT_TRUE "/P")
 
     # ----------------------------------------------------------------------
     # |
@@ -278,11 +284,11 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     # ----------------------------------------------------------------------
     # |  Dynamic Flags
     
-    # CODE_COVERAGE
-    set(_local_EXE_LINKER_flags_CODE_COVERAGE_TRUE "/PROFILE")
+    # CppCommon_CODE_COVERAGE
+    set(_local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE "/PROFILE")
 
-    # NO_DEBUG_INFO
-    set(_local_EXE_LINKER_flags_NO_DEBUG_INFO_FALSE "/DEBUG")
+    # CppCommon_NO_DEBUG_INFO
+    set(_local_EXE_LINKER_flags_CppCommon_NO_DEBUG_INFO_FALSE "/DEBUG")
 
 else()
     message(FATAL_ERROR "The compiler '${CMAKE_CXX_COMPILER_ID}' is not supported.")
@@ -293,52 +299,52 @@ endif()
 # |  Persist the static flags
 # |
 # ----------------------------------------------------------------------
-if(DEFINED _local_CXX_flags AND (${FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_UPDATED))
+if(DEFINED _local_CXX_flags AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_UPDATED))
     set(CMAKE_CXX_FLAGS ${_local_CXX_flags} CACHE string "Flags used by the CXX compiler during all builds." FORCE)
     set(_CXX_FLAGS_UPDATED true CACHE bool "Indicates that CMAKE_CXX_FLAGS has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_CXX_flags_debug AND (${FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_DEBUG_UPDATED))
+if(DEFINED _local_CXX_flags_debug AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_DEBUG_UPDATED))
     set(CMAKE_CXX_FLAGS_DEBUG ${_local_CXX_flags_debug} CACHE string "Flags used by the CXX compiler during Debug builds." FORCE)
     set(_CXX_FLAGS_DEBUG_UPDATED true CACHE bool "Indicates that CMAKE_CXX_FLAGS_DEBUG has already been updated and should not be updated during function configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_CXX_flags_release AND (${FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASE_UPDATED))
+if(DEFINED _local_CXX_flags_release AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASE_UPDATED))
     set(CMAKE_CXX_FLAGS_RELEASE ${_local_CXX_flags_release} CACHE string "Flags used by the CXX compiler during Release builds." FORCE)
     set(_CXX_FLAGS_RELEASE_UPDATED true CACHE bool "Indicates that CMAKE_CXX_FLAGS_RELEASE has already been updated and should not be updated during function configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_CXX_flags_release_min_size AND (${FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASEMINSIZE_UPDATED))
+if(DEFINED _local_CXX_flags_release_min_size AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASEMINSIZE_UPDATED))
     set(CMAKE_CXX_FLAGS_RELEASEMINSIZE ${_local_CXX_flags_release_min_size} CACHE string "Flags used by the CXX compiler during ReleaseMinSize builds." FORCE)
     set(_CXX_FLAGS_RELEASEMINSIZE_UPDATED true CACHE bool "Indicates that CMAKE_CXX_FLAGS_RELEASEMINSIZE has already been updated and should not be updated during function configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_CXX_flags_release_no_opt AND (${FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASENOOPT_UPDATED))
+if(DEFINED _local_CXX_flags_release_no_opt AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASENOOPT_UPDATED))
     set(CMAKE_CXX_FLAGS_RELEASENOOPT ${_local_CXX_flags_release_no_opt} CACHE string "Flags used by the CXX compiler during ReleaseNoOpt builds." FORCE)
     set(_CXX_FLAGS_RELEASENOOPT_UPDATED true CACHE bool "Indicates that CMAKE_CXX_FLAGS_RELEASENOOPT has already been updated and should not be updated during function configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_EXE_LINKER_flags AND (${FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_UPDATED))
+if(DEFINED _local_EXE_LINKER_flags AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_UPDATED))
     set(CMAKE_EXE_LINKER_FLAGS ${_local_EXE_LINKER_flags} CACHE string "Flags used by the linker during all builds." FORCE)
     set(_LINKER_FLAGS_UPDATED true CACHE bool "Indicates that CMAKE_EXE_LINKER_FLAGS has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_EXE_LINKER_flags_debug AND (${FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_DEBUG_UPDATED))
+if(DEFINED _local_EXE_LINKER_flags_debug AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_DEBUG_UPDATED))
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG ${_local_EXE_LINKER_flags_debug} CACHE string "Flags used by the linker during Debug builds." FORCE)
     set(_LINKER_FLAGS_DEBUG_UPDATED true CACHE bool "Indicates that CMAKE_EXE_LINKER_FLAGS_DEBUG has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_EXE_LINKER_flags_release AND (${FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASE_UPDATED))
+if(DEFINED _local_EXE_LINKER_flags_release AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASE_UPDATED))
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE ${_local_EXE_LINKER_flags_release} CACHE string "Flags used by the linker during Release builds." FORCE)
     set(_LINKER_FLAGS_RELEASE_UPDATED true CACHE bool "Indicates that CMAKE_EXE_LINKER_FLAGS_RELEASE has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_EXE_LINKER_flags_release_min_size AND (${FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASEMINSIZE_UPDATED))
+if(DEFINED _local_EXE_LINKER_flags_release_min_size AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASEMINSIZE_UPDATED))
     set(CMAKE_EXE_LINKER_FLAGS_RELEASEMINSIZE ${_local_EXE_LINKER_flags_release_min_size} CACHE string "Flags used by the linker during ReleaseMinSize builds." FORCE)
     set(_LINKER_FLAGS_RELEASEMINSIZE_UPDATED true CACHE bool "Indicates that CMAKE_EXE_LINKER_FLAGS_RELEASEMINSIZE has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_EXE_LINKER_flags_release_no_opt AND (${FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASENOOPT_UPDATED))
+if(DEFINED _local_EXE_LINKER_flags_release_no_opt AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASENOOPT_UPDATED))
     set(CMAKE_EXE_LINKER_FLAGS_RELEASENOOPT ${_local_EXE_LINKER_flags_release_no_opt} CACHE string "Flags used by the linker during ReleaseNoOpt builds." FORCE)
     set(_LINKER_FLAGS_RELEASENOOPT_UPDATED true CACHE bool "Indicates that CMAKE_EXE_LINKER_FLAGS_RELEASENOOPT has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
@@ -353,16 +359,16 @@ foreach(_flag_prefix IN ITEMS
     EXE_LINKER
 )
     foreach(_flag_type IN ITEMS 
-        UNICODE
-        STATIC_CRT
-        CODE_COVERAGE
-        NO_DEBUG_INFO
-        PREPROCESSOR_OUTPUT
+        CppCommon_UNICODE
+        CppCommon_STATIC_CRT
+        CppCommon_CODE_COVERAGE
+        CppCommon_NO_DEBUG_INFO
+        CppCommon_PREPROCESSOR_OUTPUT
     )
         set(_local_flag_name "_local_${_flag_prefix}_flags_${_flag_type}")
         if(DEFINED "${_local_flag_name}")
             set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}")
-            if(${FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
+            if(${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
                 set("${_cached_flag_name}" "${${_local_flag_name}}" CACHE string "" FORCE)
             endif()
         endif()
@@ -374,7 +380,7 @@ foreach(_flag_prefix IN ITEMS
             set(_local_flag_name "_local_${_flag_prefix}_flags_${_flag_type}_${_boolean_type}") 
             if(DEFINED "${_local_flag_name}")
                 set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}")
-                if(${FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
+                if(${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
                     set("${_cached_flag_name}" "${${_local_flag_name}}" CACHE string "" FORCE)
                 endif()
             endif()
@@ -388,7 +394,7 @@ foreach(_flag_prefix IN ITEMS
                 set(_local_flag_name "_local_${_flag_prefix}_flags_${_flag_type}_${_boolean_type}_${_configuration_type}")
                 if(DEFINED "${_local_flag_name}")
                     set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}_${_configuration_type}")
-                    if(${FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
+                    if(${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
                         set("${_cached_flag_name}" "${${_local_flag_name}}" CACHE string "" FORCE)
                     endif()
                 endif()
@@ -407,11 +413,11 @@ foreach(_flag_prefix IN ITEMS
     EXE_LINKER
 )
     foreach(_flag_type IN ITEMS 
-        UNICODE
-        STATIC_CRT
-        CODE_COVERAGE
-        NO_DEBUG_INFO
-        PREPROCESSOR_OUTPUT
+        CppCommon_UNICODE
+        CppCommon_STATIC_CRT
+        CppCommon_CODE_COVERAGE
+        CppCommon_NO_DEBUG_INFO
+        CppCommon_PREPROCESSOR_OUTPUT
     )
         set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}")
         if(DEFINED "${_cached_flag_name}")
@@ -473,40 +479,44 @@ set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
 set(CMAKE_STATIC_LINKER_FLAGS_RELEASEMINSIZE "${CMAKE_EXE_LINKER_FLAGS_RELEASEMINSIZE}")
 set(CMAKE_STATIC_LINKER_FLAGS_RELEASENOOPT "${CMAKE_EXE_LINKER_FLAGS_RELEASENOOPT}")
 
-# Output the results
-message(STATUS "CMAKE_CXX_FLAGS:                        ${CMAKE_CXX_FLAGS}")
-message(STATUS "CMAKE_CXX_FLAGS_DEBUG:                  ${CMAKE_CXX_FLAGS_DEBUG}")
-message(STATUS "CMAKE_CXX_FLAGS_RELEASE:                ${CMAKE_CXX_FLAGS_RELEASE}")
-message(STATUS "CMAKE_CXX_FLAGS_RELEASEMINSIZE:         ${CMAKE_CXX_FLAGS_RELEASEMINSIZE}")
-message(STATUS "CMAKE_CXX_FLAGS_RELEASENOOPT:           ${CMAKE_CXX_FLAGS_RELEASENOOPT}")
-message(STATUS "")
-message(STATUS "CMAKE_C_FLAGS:                          ${CMAKE_C_FLAGS}")
-message(STATUS "CMAKE_C_FLAGS_DEBUG:                    ${CMAKE_C_FLAGS_DEBUG}")
-message(STATUS "CMAKE_C_FLAGS_RELEASE:                  ${CMAKE_C_FLAGS_RELEASE}")
-message(STATUS "CMAKE_C_FLAGS_RELEASEMINSIZE:           ${CMAKE_C_FLAGS_RELEASEMINSIZE}")
-message(STATUS "CMAKE_C_FLAGS_RELEASENOOPT:             ${CMAKE_C_FLAGS_RELEASENOOPT}")
-message(STATUS "")
-message(STATUS "CMAKE_EXE_LINKER_FLAGS:                     ${CMAKE_EXE_LINKER_FLAGS}")
-message(STATUS "CMAKE_EXE_LINKER_FLAGS_DEBUG:               ${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
-message(STATUS "CMAKE_EXE_LINKER_FLAGS_RELEASE:             ${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
-message(STATUS "CMAKE_EXE_LINKER_FLAGS_RELEASEMINSIZE:      ${CMAKE_EXE_LINKER_FLAGS_RELEASEMINSIZE}")
-message(STATUS "CMAKE_EXE_LINKER_FLAGS_RELEASENOOPT:        ${CMAKE_EXE_LINKER_FLAGS_RELEASENOOPT}")
-message(STATUS "")
-message(STATUS "CMAKE_MODULE_LINKER_FLAGS:                  ${CMAKE_MODULE_LINKER_FLAGS}")
-message(STATUS "CMAKE_MODULE_LINKER_FLAGS_DEBUG:            ${CMAKE_MODULE_LINKER_FLAGS_DEBUG}")
-message(STATUS "CMAKE_MODULE_LINKER_FLAGS_RELEASE:          ${CMAKE_MODULE_LINKER_FLAGS_RELEASE}")
-message(STATUS "CMAKE_MODULE_LINKER_FLAGS_RELEASEMINSIZE:   ${CMAKE_MODULE_LINKER_FLAGS_RELEASEMINSIZE}")
-message(STATUS "CMAKE_MODULE_LINKER_FLAGS_RELEASENOOPT:     ${CMAKE_MODULE_LINKER_FLAGS_RELEASENOOPT}")
-message(STATUS "")
-message(STATUS "CMAKE_SHARED_LINKER_FLAGS:                  ${CMAKE_SHARED_LINKER_FLAGS}")
-message(STATUS "CMAKE_SHARED_LINKER_FLAGS_DEBUG:            ${CMAKE_SHARED_LINKER_FLAGS_DEBUG}")
-message(STATUS "CMAKE_SHARED_LINKER_FLAGS_RELEASE:          ${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
-message(STATUS "CMAKE_SHARED_LINKER_FLAGS_RELEASEMINSIZE:   ${CMAKE_SHARED_LINKER_FLAGS_RELEASEMINSIZE}")
-message(STATUS "CMAKE_SHARED_LINKER_FLAGS_RELEASENOOPT:     ${CMAKE_SHARED_LINKER_FLAGS_RELEASENOOPT}")
-message(STATUS "")
-message(STATUS "CMAKE_STATIC_LINKER_FLAGS:                  ${CMAKE_STATIC_LINKER_FLAGS}")
-message(STATUS "CMAKE_STATIC_LINKER_FLAGS_DEBUG:            ${CMAKE_STATIC_LINKER_FLAGS_DEBUG}")
-message(STATUS "CMAKE_STATIC_LINKER_FLAGS_RELEASE:          ${CMAKE_STATIC_LINKER_FLAGS_RELEASE}")
-message(STATUS "CMAKE_STATIC_LINKER_FLAGS_RELEASEMINSIZE:   ${CMAKE_STATIC_LINKER_FLAGS_RELEASEMINSIZE}")
-message(STATUS "CMAKE_STATIC_LINKER_FLAGS_RELEASENOOPT:     ${CMAKE_STATIC_LINKER_FLAGS_RELEASENOOPT}")
-message(STATUS "")
+if(${CppCommon_CMAKE_DEBUG})
+    # Output the results
+    message(STATUS "CMAKE_CXX_FLAGS:                    ${CMAKE_CXX_FLAGS}")
+    message(STATUS "CMAKE_CXX_FLAGS_DEBUG:              ${CMAKE_CXX_FLAGS_DEBUG}")
+    message(STATUS "CMAKE_CXX_FLAGS_RELEASE:            ${CMAKE_CXX_FLAGS_RELEASE}")
+    message(STATUS "CMAKE_CXX_FLAGS_RELEASEMINSIZE:     ${CMAKE_CXX_FLAGS_RELEASEMINSIZE}")
+    message(STATUS "CMAKE_CXX_FLAGS_RELEASENOOPT:       ${CMAKE_CXX_FLAGS_RELEASENOOPT}")
+    message(STATUS "")
+    message(STATUS "CMAKE_C_FLAGS:                      ${CMAKE_C_FLAGS}")
+    message(STATUS "CMAKE_C_FLAGS_DEBUG:                ${CMAKE_C_FLAGS_DEBUG}")
+    message(STATUS "CMAKE_C_FLAGS_RELEASE:              ${CMAKE_C_FLAGS_RELEASE}")
+    message(STATUS "CMAKE_C_FLAGS_RELEASEMINSIZE:       ${CMAKE_C_FLAGS_RELEASEMINSIZE}")
+    message(STATUS "CMAKE_C_FLAGS_RELEASENOOPT:         ${CMAKE_C_FLAGS_RELEASENOOPT}")
+    message(STATUS "")
+    message(STATUS "CMAKE_EXE_LINKER_FLAGS:                     ${CMAKE_EXE_LINKER_FLAGS}")
+    message(STATUS "CMAKE_EXE_LINKER_FLAGS_DEBUG:               ${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
+    message(STATUS "CMAKE_EXE_LINKER_FLAGS_RELEASE:             ${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
+    message(STATUS "CMAKE_EXE_LINKER_FLAGS_RELEASEMINSIZE:      ${CMAKE_EXE_LINKER_FLAGS_RELEASEMINSIZE}")
+    message(STATUS "CMAKE_EXE_LINKER_FLAGS_RELEASENOOPT:        ${CMAKE_EXE_LINKER_FLAGS_RELEASENOOPT}")
+    message(STATUS "")
+    message(STATUS "CMAKE_MODULE_LINKER_FLAGS:                  ${CMAKE_MODULE_LINKER_FLAGS}")
+    message(STATUS "CMAKE_MODULE_LINKER_FLAGS_DEBUG:            ${CMAKE_MODULE_LINKER_FLAGS_DEBUG}")
+    message(STATUS "CMAKE_MODULE_LINKER_FLAGS_RELEASE:          ${CMAKE_MODULE_LINKER_FLAGS_RELEASE}")
+    message(STATUS "CMAKE_MODULE_LINKER_FLAGS_RELEASEMINSIZE:   ${CMAKE_MODULE_LINKER_FLAGS_RELEASEMINSIZE}")
+    message(STATUS "CMAKE_MODULE_LINKER_FLAGS_RELEASENOOPT:     ${CMAKE_MODULE_LINKER_FLAGS_RELEASENOOPT}")
+    message(STATUS "")
+    message(STATUS "CMAKE_SHARED_LINKER_FLAGS:                  ${CMAKE_SHARED_LINKER_FLAGS}")
+    message(STATUS "CMAKE_SHARED_LINKER_FLAGS_DEBUG:            ${CMAKE_SHARED_LINKER_FLAGS_DEBUG}")
+    message(STATUS "CMAKE_SHARED_LINKER_FLAGS_RELEASE:          ${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
+    message(STATUS "CMAKE_SHARED_LINKER_FLAGS_RELEASEMINSIZE:   ${CMAKE_SHARED_LINKER_FLAGS_RELEASEMINSIZE}")
+    message(STATUS "CMAKE_SHARED_LINKER_FLAGS_RELEASENOOPT:     ${CMAKE_SHARED_LINKER_FLAGS_RELEASENOOPT}")
+    message(STATUS "")
+    message(STATUS "CMAKE_STATIC_LINKER_FLAGS:                  ${CMAKE_STATIC_LINKER_FLAGS}")
+    message(STATUS "CMAKE_STATIC_LINKER_FLAGS_DEBUG:            ${CMAKE_STATIC_LINKER_FLAGS_DEBUG}")
+    message(STATUS "CMAKE_STATIC_LINKER_FLAGS_RELEASE:          ${CMAKE_STATIC_LINKER_FLAGS_RELEASE}")
+    message(STATUS "CMAKE_STATIC_LINKER_FLAGS_RELEASEMINSIZE:   ${CMAKE_STATIC_LINKER_FLAGS_RELEASEMINSIZE}")
+    message(STATUS "CMAKE_STATIC_LINKER_FLAGS_RELEASENOOPT:     ${CMAKE_STATIC_LINKER_FLAGS_RELEASENOOPT}")
+    message(STATUS "")
+    message(STATUS "***** CMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}' *****")
+    message(STATUS "")
+endif()
