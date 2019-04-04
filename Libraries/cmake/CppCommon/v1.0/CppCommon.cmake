@@ -17,8 +17,14 @@ cmake_minimum_required(VERSION 3.5)
 cmake_policy(SET CMP0057 NEW)
 
 option(
-    CppCommon_FORCE_CMAKE_FLAG_GENERATION
+    CppCommon_CMAKE_FORCE_FLAG_GENERATION
     "Force the repopulation of CMAKE flags, overwriting any changes made after a previous generation."
+    "OFF"
+)
+
+option(
+    CppCommon_CMAKE_DEBUG_OUTPUT
+    "Generates cmake debug output"
     "OFF"
 )
 
@@ -49,12 +55,6 @@ option(
 option(
     CppCommon_PREPROCESSOR_OUTPUT
     "Generate preprocessor output"
-    "OFF"
-)
-
-option(
-    CppCommon_CMAKE_DEBUG
-    "Generates cmake debug output"
     "OFF"
 )
 
@@ -149,6 +149,8 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
         /Oy-                                # Omit frame pointers
         /permissive-                        # Disable some nonconforming code to compile (feature set subject to change)
         /sdl                                # enable additional security features and warnings
+        /W4                                 # warning-level 4
+        /WX                                 # treat warnings as errors
         /Zc:forScope                        # enforce Standard C++ for scoping rules
         /Zc:wchar_t                         # wchar_t is the native type, not a typedef
     )
@@ -299,52 +301,52 @@ endif()
 # |  Persist the static flags
 # |
 # ----------------------------------------------------------------------
-if(DEFINED _local_CXX_flags AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_UPDATED))
+if(DEFINED _local_CXX_flags AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_UPDATED))
     set(CMAKE_CXX_FLAGS ${_local_CXX_flags} CACHE string "Flags used by the CXX compiler during all builds." FORCE)
     set(_CXX_FLAGS_UPDATED true CACHE bool "Indicates that CMAKE_CXX_FLAGS has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_CXX_flags_debug AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_DEBUG_UPDATED))
+if(DEFINED _local_CXX_flags_debug AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_DEBUG_UPDATED))
     set(CMAKE_CXX_FLAGS_DEBUG ${_local_CXX_flags_debug} CACHE string "Flags used by the CXX compiler during Debug builds." FORCE)
     set(_CXX_FLAGS_DEBUG_UPDATED true CACHE bool "Indicates that CMAKE_CXX_FLAGS_DEBUG has already been updated and should not be updated during function configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_CXX_flags_release AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASE_UPDATED))
+if(DEFINED _local_CXX_flags_release AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASE_UPDATED))
     set(CMAKE_CXX_FLAGS_RELEASE ${_local_CXX_flags_release} CACHE string "Flags used by the CXX compiler during Release builds." FORCE)
     set(_CXX_FLAGS_RELEASE_UPDATED true CACHE bool "Indicates that CMAKE_CXX_FLAGS_RELEASE has already been updated and should not be updated during function configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_CXX_flags_release_min_size AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASEMINSIZE_UPDATED))
+if(DEFINED _local_CXX_flags_release_min_size AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASEMINSIZE_UPDATED))
     set(CMAKE_CXX_FLAGS_RELEASEMINSIZE ${_local_CXX_flags_release_min_size} CACHE string "Flags used by the CXX compiler during ReleaseMinSize builds." FORCE)
     set(_CXX_FLAGS_RELEASEMINSIZE_UPDATED true CACHE bool "Indicates that CMAKE_CXX_FLAGS_RELEASEMINSIZE has already been updated and should not be updated during function configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_CXX_flags_release_no_opt AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASENOOPT_UPDATED))
+if(DEFINED _local_CXX_flags_release_no_opt AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASENOOPT_UPDATED))
     set(CMAKE_CXX_FLAGS_RELEASENOOPT ${_local_CXX_flags_release_no_opt} CACHE string "Flags used by the CXX compiler during ReleaseNoOpt builds." FORCE)
     set(_CXX_FLAGS_RELEASENOOPT_UPDATED true CACHE bool "Indicates that CMAKE_CXX_FLAGS_RELEASENOOPT has already been updated and should not be updated during function configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_EXE_LINKER_flags AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_UPDATED))
+if(DEFINED _local_EXE_LINKER_flags AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_UPDATED))
     set(CMAKE_EXE_LINKER_FLAGS ${_local_EXE_LINKER_flags} CACHE string "Flags used by the linker during all builds." FORCE)
     set(_LINKER_FLAGS_UPDATED true CACHE bool "Indicates that CMAKE_EXE_LINKER_FLAGS has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_EXE_LINKER_flags_debug AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_DEBUG_UPDATED))
+if(DEFINED _local_EXE_LINKER_flags_debug AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_DEBUG_UPDATED))
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG ${_local_EXE_LINKER_flags_debug} CACHE string "Flags used by the linker during Debug builds." FORCE)
     set(_LINKER_FLAGS_DEBUG_UPDATED true CACHE bool "Indicates that CMAKE_EXE_LINKER_FLAGS_DEBUG has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_EXE_LINKER_flags_release AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASE_UPDATED))
+if(DEFINED _local_EXE_LINKER_flags_release AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASE_UPDATED))
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE ${_local_EXE_LINKER_flags_release} CACHE string "Flags used by the linker during Release builds." FORCE)
     set(_LINKER_FLAGS_RELEASE_UPDATED true CACHE bool "Indicates that CMAKE_EXE_LINKER_FLAGS_RELEASE has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_EXE_LINKER_flags_release_min_size AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASEMINSIZE_UPDATED))
+if(DEFINED _local_EXE_LINKER_flags_release_min_size AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASEMINSIZE_UPDATED))
     set(CMAKE_EXE_LINKER_FLAGS_RELEASEMINSIZE ${_local_EXE_LINKER_flags_release_min_size} CACHE string "Flags used by the linker during ReleaseMinSize builds." FORCE)
     set(_LINKER_FLAGS_RELEASEMINSIZE_UPDATED true CACHE bool "Indicates that CMAKE_EXE_LINKER_FLAGS_RELEASEMINSIZE has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_EXE_LINKER_flags_release_no_opt AND (${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASENOOPT_UPDATED))
+if(DEFINED _local_EXE_LINKER_flags_release_no_opt AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASENOOPT_UPDATED))
     set(CMAKE_EXE_LINKER_FLAGS_RELEASENOOPT ${_local_EXE_LINKER_flags_release_no_opt} CACHE string "Flags used by the linker during ReleaseNoOpt builds." FORCE)
     set(_LINKER_FLAGS_RELEASENOOPT_UPDATED true CACHE bool "Indicates that CMAKE_EXE_LINKER_FLAGS_RELEASENOOPT has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
@@ -368,7 +370,7 @@ foreach(_flag_prefix IN ITEMS
         set(_local_flag_name "_local_${_flag_prefix}_flags_${_flag_type}")
         if(DEFINED "${_local_flag_name}")
             set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}")
-            if(${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
+            if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
                 set("${_cached_flag_name}" "${${_local_flag_name}}" CACHE string "" FORCE)
             endif()
         endif()
@@ -380,7 +382,7 @@ foreach(_flag_prefix IN ITEMS
             set(_local_flag_name "_local_${_flag_prefix}_flags_${_flag_type}_${_boolean_type}") 
             if(DEFINED "${_local_flag_name}")
                 set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}")
-                if(${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
+                if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
                     set("${_cached_flag_name}" "${${_local_flag_name}}" CACHE string "" FORCE)
                 endif()
             endif()
@@ -394,7 +396,7 @@ foreach(_flag_prefix IN ITEMS
                 set(_local_flag_name "_local_${_flag_prefix}_flags_${_flag_type}_${_boolean_type}_${_configuration_type}")
                 if(DEFINED "${_local_flag_name}")
                     set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}_${_configuration_type}")
-                    if(${CppCommon_FORCE_CMAKE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
+                    if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
                         set("${_cached_flag_name}" "${${_local_flag_name}}" CACHE string "" FORCE)
                     endif()
                 endif()
@@ -479,7 +481,7 @@ set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
 set(CMAKE_STATIC_LINKER_FLAGS_RELEASEMINSIZE "${CMAKE_EXE_LINKER_FLAGS_RELEASEMINSIZE}")
 set(CMAKE_STATIC_LINKER_FLAGS_RELEASENOOPT "${CMAKE_EXE_LINKER_FLAGS_RELEASENOOPT}")
 
-if(${CppCommon_CMAKE_DEBUG})
+if(${CppCommon_CMAKE_DEBUG_OUTPUT})
     # Output the results
     message(STATUS "CMAKE_CXX_FLAGS:                    ${CMAKE_CXX_FLAGS}")
     message(STATUS "CMAKE_CXX_FLAGS_DEBUG:              ${CMAKE_CXX_FLAGS_DEBUG}")
