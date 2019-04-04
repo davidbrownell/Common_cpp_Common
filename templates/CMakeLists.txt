@@ -31,9 +31,12 @@ add_executable( <project_name>
     <project_files>
 )
 
-# include(CTest)
-# enable_testing()
+enable_testing()
 
-# set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-# set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-# include(CPack)
+foreach(_test_name IN ITEMS
+    <file>_UnitTest
+)
+    add_executable(${_name ${_name}.cpp)
+
+    add_test(NAME ${_name} COMMAND ${_name} --success)
+endforeach()
