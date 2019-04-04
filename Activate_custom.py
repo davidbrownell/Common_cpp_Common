@@ -24,6 +24,7 @@ from RepositoryBootstrap import Constants as RepositoryBootstrapConstants
 from RepositoryBootstrap.SetupAndActivate import CommonEnvironment, CurrentShell
 from RepositoryBootstrap.SetupAndActivate import DynamicPluginArchitecture
 from RepositoryBootstrap.Impl.ActivationActivity import ActivationActivity
+
 del sys.path[0]
 
 # ----------------------------------------------------------------------
@@ -59,7 +60,11 @@ def GetCustomActions(
     actions = []
 
     if fast:
-        actions.append(CurrentShell.Commands.Message("** FAST: Activating without verifying content. ({})".format(_script_fullpath)))
+        actions.append(
+            CurrentShell.Commands.Message(
+                "** FAST: Activating without verifying content. ({})".format(_script_fullpath),
+            ),
+        )
     else:
         for tool, version_infos in [
             (
@@ -126,7 +131,9 @@ def GetCustomActions(
         for directory in _EnumLibraryDependencies("cmake", repository.Root, version_info):
             cmake_dirs.append(directory.replace("\\", "/"))
 
-    actions.append(CurrentShell.Commands.Augment("DEVELOPMENT_ENVIRONMENT_CMAKE_MODULE_PATH", cmake_dirs))
+    actions.append(
+        CurrentShell.Commands.Augment("DEVELOPMENT_ENVIRONMENT_CMAKE_MODULE_PATH", cmake_dirs),
+    )
 
     # Load all libraries
     includes = []
@@ -152,11 +159,35 @@ def GetCustomActions(
         ),
     )
 
-    # Add the formatter
+    # Add scripts that augment existing functionality
+    actions += DynamicPluginArchitecture.CreateRegistrationStatements(
+        "DEVELOPMENT_ENVIRONMENT_COMPILERS",
+        os.path.join(_script_dir, "Scripts", "Compilers"),
+        lambda fullpath, name, ext: ext == ".py" and (name.endswith("Compiler") or name.endswith("CodeGenerator") or name.endswith("Verifier")),
+    )
+
+    actions += DynamicPluginArchitecture.CreateRegistrationStatements(
+        "DEVELOPMENT_ENVIRONMENT_TEST_PARSERS",
+        os.path.join(_script_dir, "Scripts", "TestParsers"),
+        lambda fullpath,
+        name,
+        ext: ext == ".py" and name.endswith("TestParser"),
+    )
+
     actions += DynamicPluginArchitecture.CreateRegistrationStatements(
         "DEVELOPMENT_ENVIRONMENT_FORMATTERS",
         os.path.join(_script_dir, "Scripts", "Formatters"),
-        lambda fullpath, name, ext: ext == ".py" and name.endswith("Formatter"),
+        lambda fullpath,
+        name,
+        ext: ext == ".py" and name.endswith("Formatter"),
+    )
+
+    actions.append(
+        CurrentShell.Commands.Augment(
+            "DEVELOPMENT_ENVIRONMENT_TESTER_CONFIGURATIONS",
+            ["c++-compiler-CMake", "c++-test_parser-CMake"],
+            update_memory=True,
+        ),
     )
 
     return actions
@@ -203,6 +234,7 @@ def GetCustomScriptExtractors():
     """
 
     return
+
 
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
