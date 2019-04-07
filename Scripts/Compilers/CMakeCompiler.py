@@ -113,6 +113,7 @@ class Compiler(
             cls,
         )._GetOptionalMetadata()
 
+    # ----------------------------------------------------------------------
     @classmethod
     @Interface.override
     def _GetRequiredContextNames(cls):
