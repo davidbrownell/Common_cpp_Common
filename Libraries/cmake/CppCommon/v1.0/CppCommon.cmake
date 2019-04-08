@@ -122,7 +122,7 @@ endforeach()
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
-if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
+if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (WIN32 AND CMAKE_CXX_COMPILER_ID MATCHES Clang))
 
     # ----------------------------------------------------------------------
     # |
@@ -157,6 +157,18 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
         string(APPEND _local_CXX_flags " ${_flag}")
     endforeach()
     
+    # Apply extra arguments for Clang
+    if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
+        foreach(_flag IN ITEMS
+            "-Wno-unused-command-line-argument"
+            "-Wno-invalid-token-paste"
+            "-Wno-unused-value"             # TODO: Remove this, as it is a valuable warning
+                                            # TODO: Enable all warnings (I don't think /W4 is doing it for clang)
+        )
+            string(APPEND _local_CXX_flags " ${_flag}")
+        endforeach()
+    endif()
+
     # Debug
     set(_local_CXX_flags_debug "")
     foreach(_flag IN ITEMS
