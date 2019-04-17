@@ -15,3 +15,5 @@ Tools/cmake/v3.13.4/Windows/*
 
 Tools/ninja/v1.9.0/Linux/*
 Tools/ninja/v1.9.0/Windows/*
+
+Libraries/Python/CppCommon/v1.0/CppCommon/CodeCoverageFilter/GeneratedCode/Compiler.ConditionalInvocationQueryMixin.data

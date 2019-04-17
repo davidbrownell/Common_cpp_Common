@@ -155,7 +155,6 @@ def GetCustomActions(
         CurrentShell.Commands.Set(
             "DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE",
             configuration,
-            update_memory=True,
         ),
     )
 

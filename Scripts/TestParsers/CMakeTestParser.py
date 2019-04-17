@@ -35,7 +35,7 @@ class TestParser(TestParserImpl):
     # ----------------------------------------------------------------------
     # |  Public Properties
     Name                                    = Interface.DerivedProperty("CMake")
-    Description                             = Interface.DerivedProperty("Parses Cmake CTest output")
+    Description                             = Interface.DerivedProperty("Parses CMake CTest output.")
 
     # ----------------------------------------------------------------------
     # |  Methods
@@ -57,7 +57,10 @@ class TestParser(TestParserImpl):
     @staticmethod
     @Interface.override
     def CreateInvokeCommandLine(context, debug_on_error):
-        return 'cd "{}" && ctest --parallel'.format(context["output_dir"])
+        return 'cd "{output_dir}" && ctest{parallel}'.format(
+            output_dir=context["output_dir"],
+            parallel=" --parallel" if not context.get("is_profile", False) else "",
+        )
 
     # ----------------------------------------------------------------------
     @staticmethod

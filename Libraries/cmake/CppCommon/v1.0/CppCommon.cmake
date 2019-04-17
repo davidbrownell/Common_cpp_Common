@@ -30,7 +30,7 @@ option(
 
 option(
     CppCommon_UNICODE
-    "Use the unicode character set (default is mutli-byte (best practice is to leverage UTF-8))."
+    "Use the unicode character set (default is multi-byte (best practice is to leverage UTF-8))."
     "OFF"
 )
 
@@ -122,8 +122,9 @@ endforeach()
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
-if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (WIN32 AND CMAKE_CXX_COMPILER_ID MATCHES Clang))
+get_filename_component(_compiler_basename "${CMAKE_CXX_COMPILER}" NAME)
 
+if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AND _compiler_basename MATCHES "clang-cl.exe"))
     # ----------------------------------------------------------------------
     # |
     # |  Compiler
@@ -160,10 +161,15 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (WIN32 AND CMAKE_CXX_COMPILER_ID MATCHE
     # Apply extra arguments for Clang
     if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
         foreach(_flag IN ITEMS
-            "-Wno-unused-command-line-argument"
+            "-Wall"
+            "-Wno-c++98-compat-pedantic"
+            "-Wno-disabled-macro-expansion"
+            "-Wno-extra-semi"
+            "-Wno-gnu-zero-variadic-macro-arguments"
             "-Wno-invalid-token-paste"
-            "-Wno-unused-value"             # TODO: Remove this, as it is a valuable warning
-                                            # TODO: Enable all warnings (I don't think /W4 is doing it for clang)
+            "-Wno-reserved-id-macro"
+            "-Wno-unused-command-line-argument"
+            "-Wno-unused-template"
         )
             string(APPEND _local_CXX_flags " ${_flag}")
         endforeach()
@@ -228,17 +234,21 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (WIN32 AND CMAKE_CXX_COMPILER_ID MATCHE
     set(_local_CXX_flags_CppCommon_UNICODE_FALSE "/DMBCS /D_MBCS")
 
     # CppCommon_STATIC_CRT
+    set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE "")
     set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_DEBUG "/MTd")
     set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASE "/MT")
     set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASEMINSIZE "${_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASE}")
     set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASENOOPT "${_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASE}")
 
+    set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE "")
     set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_DEBUG "/MDd")
     set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASE "/MD")
     set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASEMINSIZE "${_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASE}")
     set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASENOOPT "${_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASE}")
 
     # CppCommon_CODE_COVERAGE
+    set(_local_CXX_flags_CppCommon_CODE_COVERAGE_TRUE "")
+
     set(_local_CXX_flags_CppCommon_CODE_COVERAGE_FALSE "")
     foreach(_flag IN ITEMS
         /Zc:inline                          # remove unreferenced function or data if it is COMDAT or has internal linkage only
@@ -247,15 +257,17 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (WIN32 AND CMAKE_CXX_COMPILER_ID MATCHE
     endforeach()
     
     # CppCommon_NO_DEBUG_INFO
+    set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_TRUE "")
+
     set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_DEBUG "/ZI")
     set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASE "/Zi")
     set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASEMINSIZE "${_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASE}")
     set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASENOOPT "${_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASE}")
 
     # CppCommon_PREPROCESSOR_OUTPUT
-    set(_local_CXX_flags_CppCommon_PREPROCESSOR_OUTPUT_FALSE "")
     set(_local_CXX_flags_CppCommon_PREPROCESSOR_OUTPUT_TRUE "/P")
-
+    set(_local_CXX_flags_CppCommon_PREPROCESSOR_OUTPUT_FALSE "")
+    
     # ----------------------------------------------------------------------
     # |
     # |  Linker
@@ -276,16 +288,20 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (WIN32 AND CMAKE_CXX_COMPILER_ID MATCHE
     endforeach()
 
     set(_local_EXE_LINKER_flags_debug "")
-    foreach(_flag IN ITEMS
-        /INCREMENTAL                        # Leverage incremental linking
-    )
-        string(APPEND _local_EXE_LINKER_flags_debug " ${_flag}")
-    endforeach()
 
     set(_local_EXE_LINKER_flags_release "")
+    
+    # The following flags are valid for MSVC but not for Clang
+    if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
+        foreach(_flag IN ITEMS
+            /LTCG                           # Link-time code generation
+        )
+            string(APPEND _local_EXE_LINKER_flags_release " ${_flag}")
+        endforeach()
+    endif()
+
+    # The following flags are valid for both MSVC and Clang
     foreach(_flag IN ITEMS 
-        /LTCG                               # Link-time code generation
-        /INCREMENTAL:NO                     # Do not leverage incremental linking
         /OPT:ICF                            # Enable COMDAT Folding
         /OPT:REF                            # References
     )
@@ -299,10 +315,29 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (WIN32 AND CMAKE_CXX_COMPILER_ID MATCHE
     # |  Dynamic Flags
     
     # CppCommon_CODE_COVERAGE
-    set(_local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE "/PROFILE")
+    set(_local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE "")
+    foreach(_flag IN ITEMS
+        /PROFILE
+        /OPT:NOREF
+        /OPT:NOICF
+    )
+        string(APPEND _local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
+    endforeach()
+
+    set(_local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_FALSE "")
+    set(_local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_FALSE_DEBUG "/INCREMENTAL")
+    set(_local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_FALSE_RELEASE "/INCREMENTAL:NO")
 
     # CppCommon_NO_DEBUG_INFO
+    set(_local_EXE_LINKER_flags_CppCommon_NO_DEBUG_INFO_TRUE "")
     set(_local_EXE_LINKER_flags_CppCommon_NO_DEBUG_INFO_FALSE "/DEBUG")
+
+    # When profiling, MSVC is not able to instrument x64 binaries compiled with the
+    # static CRT. If this is the case, disable the static CRT.
+    if(${CppCommon_CODE_COVERAGE} AND ${CppCommon_STATIC_CRT} AND "$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x64")
+        message(WARNING "The static CRT cannot be used with code coverage builds on x64; disabling static CRT.\n")
+        set(CppCommon_STATIC_CRT OFF)
+    endif()
 
 else()
     message(FATAL_ERROR "The compiler '${CMAKE_CXX_COMPILER_ID}' is not supported.")
