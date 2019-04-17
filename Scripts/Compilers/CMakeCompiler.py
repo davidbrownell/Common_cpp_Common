@@ -57,7 +57,7 @@ class Compiler(
     # ----------------------------------------------------------------------
     # |  Properties
     Name                                    = Interface.DerivedProperty("CMake")
-    Description                             = Interface.DerivedProperty("Compiles a CMake directory")
+    Description                             = Interface.DerivedProperty("Compiles a CMake directory.")
     InputTypeInfo                           = Interface.DerivedProperty(DirectoryTypeInfo())
 
     # ----------------------------------------------------------------------
