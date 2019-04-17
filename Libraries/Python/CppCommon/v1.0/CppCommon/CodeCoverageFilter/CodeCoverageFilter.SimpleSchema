@@ -1,0 +1,11 @@
+# Include and Exclude values may be explicit or glob strings. '/' should be used
+# for all path separators, regardless of the current operating system.
+
+# These apply to any descendant file
+<filter ?>:
+  <includes string *>
+  <excludes string *>
+
+# These apply to any descendant file matching the glob pattern 
+<named_filters filter *>:
+  [glob string]
