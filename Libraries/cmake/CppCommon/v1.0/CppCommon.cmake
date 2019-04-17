@@ -332,6 +332,13 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
     set(_local_EXE_LINKER_flags_CppCommon_NO_DEBUG_INFO_TRUE "")
     set(_local_EXE_LINKER_flags_CppCommon_NO_DEBUG_INFO_FALSE "/DEBUG")
 
+    # When profiling, MSVC is not able to instrument x64 binaries compiled with the
+    # static CRT. If this is the case, disable the static CRT.
+    if(${CppCommon_CODE_COVERAGE} AND ${CppCommon_STATIC_CRT} AND "$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x64")
+        message(WARNING "The static CRT cannot be used with code coverage builds on x64; disabling static CRT.\n")
+        set(CppCommon_STATIC_CRT OFF)
+    endif()
+
 else()
     message(FATAL_ERROR "The compiler '${CMAKE_CXX_COMPILER_ID}' is not supported.")
 endif()
