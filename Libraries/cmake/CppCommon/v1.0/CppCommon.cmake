@@ -203,6 +203,16 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
         string(APPEND _local_CXX_flags_release " ${_flag}")
     endforeach()
 
+    # Apply extra arguments for Clang
+    if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
+        foreach(_flag IN ITEMS
+            "-Xclang -O3"                   # Advanced optimizations
+            "-Xclang -fno-inline"           # Inline optimizations present problems with -O3
+        )
+            string(APPEND _local_CXX_flags_release " ${_flag}")
+        endforeach()
+    endif()
+
     # ReleaseMinSize
     set(_local_CXX_flags_release_min_size "")
     foreach(_flag IN ITEMS
