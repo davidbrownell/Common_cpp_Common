@@ -158,23 +158,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
         string(APPEND _local_CXX_flags " ${_flag}")
     endforeach()
     
-    # Apply extra arguments for Clang
-    if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
-        foreach(_flag IN ITEMS
-            "-Wall"
-            "-Wno-c++98-compat-pedantic"
-            "-Wno-disabled-macro-expansion"
-            "-Wno-extra-semi"
-            "-Wno-gnu-zero-variadic-macro-arguments"
-            "-Wno-invalid-token-paste"
-            "-Wno-reserved-id-macro"
-            "-Wno-unused-command-line-argument"
-            "-Wno-unused-template"
-        )
-            string(APPEND _local_CXX_flags " ${_flag}")
-        endforeach()
-    endif()
-
     # Debug
     set(_local_CXX_flags_debug "")
     foreach(_flag IN ITEMS
@@ -202,16 +185,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
     )
         string(APPEND _local_CXX_flags_release " ${_flag}")
     endforeach()
-
-    # Apply extra arguments for Clang
-    if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
-        foreach(_flag IN ITEMS
-            "-Xclang -O3"                   # Advanced optimizations
-            "-Xclang -fno-inline"           # Inline optimizations present problems with -O3
-        )
-            string(APPEND _local_CXX_flags_release " ${_flag}")
-        endforeach()
-    endif()
 
     # ReleaseMinSize
     set(_local_CXX_flags_release_min_size "")
@@ -349,6 +322,44 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
         set(CppCommon_STATIC_CRT OFF)
     endif()
 
+    # Apply extra arguments for Clang
+    if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
+        # Standard args
+        foreach(_flag IN ITEMS
+            "-Wall"
+            "-Wno-c++98-compat-pedantic"
+            "-Wno-disabled-macro-expansion"
+            "-Wno-extra-semi"
+            "-Wno-gnu-zero-variadic-macro-arguments"
+            "-Wno-invalid-token-paste"
+            "-Wno-reserved-id-macro"
+            "-Wno-unused-command-line-argument"
+            "-Wno-unused-template"
+        )
+            string(APPEND _local_CXX_flags " ${_flag}")
+        endforeach()
+
+        # Release args
+        foreach(_flag IN ITEMS
+            "-Xclang -O3"                   # Advanced optimizations
+            "-Xclang -fno-inline"           # Inline optimizations present problems with -O3
+        )
+            string(APPEND _local_CXX_flags_release " ${_flag}")
+        endforeach()
+
+        # CppCommon_CODE_COVERAGE
+        foreach(_flag IN ITEMS
+            "--coverage"
+        )
+            string(APPEND _local_CXX_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
+        endforeach()
+
+        foreach(_flag IN ITEMS
+            "clang_rt.profile-x86_64.lib"
+        )
+            string(APPEND _local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
+        endforeach()
+    endif()
 else()
     message(FATAL_ERROR "The compiler '${CMAKE_CXX_COMPILER_ID}' is not supported.")
 endif()
