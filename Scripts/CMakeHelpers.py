@@ -99,6 +99,48 @@ def Generate(
         if result != 0:
             return result
 
+        # Create a python file that can be used to clean the directory
+        existing_items = os.listdir(build_dir)
+        assert existing_items
+
+        with open(os.path.join(build_dir, "Clean.py"), "w") as f:
+            f.write(
+                textwrap.dedent(
+                    """\
+                    #!/usr/bin/env python
+
+                    import os
+                    import sys
+
+                    import CommonEnvironment
+                    from CommonEnvironment import FileSystem
+                    from CommonEnvironment.StreamDecorator import StreamDecorator
+                    
+                    # ----------------------------------------------------------------------
+                    _script_fullpath                            = CommonEnvironment.ThisFullpath()
+                    _script_dir, _script_name                   = os.path.split(_script_fullpath)
+                    # ----------------------------------------------------------------------
+
+                    existing_items = set([{existing_items_list}])
+
+                    output_stream = StreamDecorator(sys.stdout)
+
+                    for item in os.listdir(_script_dir):
+                        if item in existing_items or item == _script_name:
+                            continue
+
+                        fullpath = os.path.join(_script_dir, item)
+
+                        output_stream.write("Removing '{{}}'...".format(fullpath))
+                        with output_stream.DoneManager():
+                            FileSystem.RemoveItem(fullpath)
+
+                    """,
+                ).format(
+                    existing_items_list=", ".join(['"{}"'.format(existing_item) for existing_item in existing_items]),
+                ),
+            )
+
         if build:
             on_status_update("Building")
             _PrintHeader("Build Output", output_stream)

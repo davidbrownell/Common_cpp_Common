@@ -339,6 +339,10 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
             string(APPEND _local_CXX_flags " ${_flag}")
         endforeach()
 
+        if("$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x86")
+            string(APPEND _local_CXX_flags " -m32")
+        endif()
+
         # Release args
         foreach(_flag IN ITEMS
             "-Xclang -O3"                   # Advanced optimizations
