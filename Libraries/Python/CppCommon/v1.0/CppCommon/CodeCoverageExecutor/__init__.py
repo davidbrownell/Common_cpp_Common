@@ -36,6 +36,10 @@ class CodeCoverageExecutor(Interface.Interface):
     def DefaultFileName(self):
         raise Exception("Abstract Property")
 
+    @Interface.abstractproperty
+    def Units(self):
+        raise Exception("Abstract Property")
+
     # ----------------------------------------------------------------------
     # |  Methods
     @staticmethod
