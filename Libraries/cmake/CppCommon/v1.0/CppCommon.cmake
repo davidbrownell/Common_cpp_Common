@@ -122,9 +122,129 @@ endforeach()
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
+
+# Set the local flags to empty values
+foreach(_flag_prefix IN ITEMS
+    CXX
+    EXE_LINKER
+)
+    set("_local_${_flag_prefix}_flags" "")
+
+    set("_local_${_flag_prefix}_flags_DEBUG" "")
+    set("_local_${_flag_prefix}_flags_RELEASE" "")
+    set("_local_${_flag_prefix}_flags_RELEASEMINSIZE" "")
+    set("_local_${_flag_prefix}_flags_RELEASENOOPT" "")
+
+    foreach(_flag_type IN ITEMS
+        CppCommon_UNICODE
+        CppCommon_STATIC_CRT
+        CppCommon_CODE_COVERAGE
+        CppCommon_NO_DEBUG_INFO
+        CppCommon_PREPROCESSOR_OUTPUT
+    )
+        foreach(_boolean_type IN ITEMS
+            TRUE
+            FALSE
+        )
+            set("_local_${_flag_prefix}_flags_${_flag_type}" "")
+
+            foreach(_configuration_type IN ITEMS
+                DEBUG
+                RELEASE
+                RELEASEMINSIZE
+                RELEASENOOPT
+            )
+                set("_local_${_flag_prefix}_flags_${_flag_type}_${_configuration_type}" "")
+
+            endforeach()
+        endforeach()
+    endforeach()
+endforeach()
+
 get_filename_component(_compiler_basename "${CMAKE_CXX_COMPILER}" NAME)
 
+if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
+    # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
+    # |
+    # |  Clang args common to the cl and gcc proxies
+    # |
+    # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
+
+    # ----------------------------------------------------------------------
+    # |
+    # |  Compiler
+    # |
+    # ----------------------------------------------------------------------
+
+    # ----------------------------------------------------------------------
+    # |  Static Flags
+    foreach(_flag IN ITEMS
+        -Wall
+        -Wno-c++98-compat-pedantic
+        -Wno-disabled-macro-expansion
+        -Wno-extra-semi
+        -Wno-gnu-zero-variadic-macro-arguments
+        -Wno-invalid-token-paste
+        -Wno-reserved-id-macro
+        -Wno-unused-command-line-argument
+        -Wno-unused-template
+    )
+        string(APPEND _local_CXX_flags " ${_flag}")
+    endforeach()
+
+    if("$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x86")
+        string(APPEND _local_CXX_flags " -m32")
+    endif()
+
+    # ----------------------------------------------------------------------
+    # |  Dynamic Flags
+    
+    # CppCommon_CODE_COVERAGE
+    foreach(_flag IN ITEMS
+        --coverage
+    )
+        string(APPEND _local_CXX_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
+    endforeach()
+
+    # ----------------------------------------------------------------------
+    # |
+    # |  Linker
+    # |
+    # ----------------------------------------------------------------------
+    
+    # ----------------------------------------------------------------------
+    # |  Dynamic Flags
+    
+    # CppCommon_CODE_COVERAGE
+    foreach(_flag IN ITEMS
+        clang_rt.profile-x86_64.lib
+    )
+        string(APPEND _local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
+    endforeach()
+endif()
+
 if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AND _compiler_basename MATCHES "clang-cl.exe"))
+    # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
+    # |
+    # |  MSVC / clang-cl
+    # |
+    # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
+
+    # When profiling, MSVC is not able to instrument x64 binaries compiled with the
+    # static CRT. If this is the case, disable the static CRT.
+    if(${CppCommon_CODE_COVERAGE} AND ${CppCommon_STATIC_CRT} AND "$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x64")
+        message(WARNING "The static CRT cannot be used with code coverage builds on x64; disabling static CRT.\n")
+        set(CppCommon_STATIC_CRT OFF)
+    endif()
+
     # ----------------------------------------------------------------------
     # |
     # |  Compiler
@@ -133,9 +253,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
     
     # ----------------------------------------------------------------------
     # |  Static Flags
-
-    # Common Flags
-    set(_local_CXX_flags "")
     foreach(_flag IN ITEMS
         /DWIN32
         /D_WINDOWS
@@ -159,7 +276,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
     endforeach()
     
     # Debug
-    set(_local_CXX_flags_debug "")
     foreach(_flag IN ITEMS
         /DDEBUG
         /D_DEBUG
@@ -167,11 +283,10 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
         /Od                                 # disable optimizations
         /RTC1                               # Enable fast checks
     )
-        string(APPEND _local_CXX_flags_debug " ${_flag}")
+        string(APPEND _local_CXX_flags_DEBUG " ${_flag}")
     endforeach()
 
     # Release
-    set(_local_CXX_flags_release "")
     foreach(_flag IN ITEMS
         /DNDEBUG
         /D_NDEBUG
@@ -183,11 +298,19 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
         /Ot                                 # favor code speed
         /Ox                                 # optimizations (favor speed)
     )
-        string(APPEND _local_CXX_flags_release " ${_flag}")
+        string(APPEND _local_CXX_flags_RELEASE " ${_flag}")
     endforeach()
 
+    if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
+        foreach(_flag IN ITEMS
+            "-Xclang -O3"                   # Advanced optimizations
+            "-Xclang -fno-inline"           # Inline optimizations present problems with -O3
+        )
+            string(APPEND _local_CXX_flags_RELEASE " ${_flag}")
+        endforeach()
+    endif()
+
     # ReleaseMinSize
-    set(_local_CXX_flags_release_min_size "")
     foreach(_flag IN ITEMS
         /DNDEBUG
         /D_NDEBUG
@@ -195,18 +318,17 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
         /Ob1                                # inline expansion (default n=0)
         /Os                                 # favor code space
     )
-        string(APPEND _local_CXX_flags_release_min_size " ${_flag}")
+        string(APPEND _local_CXX_flags_RELEASEMINSIZE " ${_flag}")
     endforeach()
 
     # ReleaseNoOpt
-    set(_local_CXX_flags_release_no_opt "")
     foreach(_flag IN ITEMS
         /DNDEBUG
         /D_NDEBUG
         /Ob0                                # inline expansion (default n=0)
         /Od                                 # disable optimizations
     )
-        string(APPEND _local_CXX_flags_release_no_opt " ${_flag}")
+        string(APPEND _local_CXX_flags_RELEASENOOPT " ${_flag}")
     endforeach()
 
     # ----------------------------------------------------------------------
@@ -217,22 +339,17 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
     set(_local_CXX_flags_CppCommon_UNICODE_FALSE "/DMBCS /D_MBCS")
 
     # CppCommon_STATIC_CRT
-    set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE "")
     set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_DEBUG "/MTd")
     set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASE "/MT")
     set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASEMINSIZE "${_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASE}")
     set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASENOOPT "${_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASE}")
 
-    set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE "")
     set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_DEBUG "/MDd")
     set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASE "/MD")
     set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASEMINSIZE "${_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASE}")
     set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASENOOPT "${_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASE}")
 
     # CppCommon_CODE_COVERAGE
-    set(_local_CXX_flags_CppCommon_CODE_COVERAGE_TRUE "")
-
-    set(_local_CXX_flags_CppCommon_CODE_COVERAGE_FALSE "")
     foreach(_flag IN ITEMS
         /Zc:inline                          # remove unreferenced function or data if it is COMDAT or has internal linkage only
     )
@@ -240,8 +357,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
     endforeach()
     
     # CppCommon_NO_DEBUG_INFO
-    set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_TRUE "")
-
     set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_DEBUG "/ZI")
     set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASE "/Zi")
     set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASEMINSIZE "${_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASE}")
@@ -249,7 +364,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
 
     # CppCommon_PREPROCESSOR_OUTPUT
     set(_local_CXX_flags_CppCommon_PREPROCESSOR_OUTPUT_TRUE "/P")
-    set(_local_CXX_flags_CppCommon_PREPROCESSOR_OUTPUT_FALSE "")
     
     # ----------------------------------------------------------------------
     # |
@@ -259,7 +373,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
 
     # ----------------------------------------------------------------------
     # |  Static Flags
-    set(_local_EXE_LINKER_flags "")
     foreach(_flag IN ITEMS
         /DYNAMICBASE                        # Randomized base address
         /MANIFEST                           # Creates a side-by-side manifest file and optionally embeds it in the binary.
@@ -270,10 +383,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
         string(APPEND _local_EXE_LINKER_flags " ${_flag}")
     endforeach()
 
-    set(_local_EXE_LINKER_flags_debug "")
-
-    set(_local_EXE_LINKER_flags_release "")
-    
     # The following flags are valid for MSVC but not for Clang
     if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
         foreach(_flag IN ITEMS
@@ -298,7 +407,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
     # |  Dynamic Flags
     
     # CppCommon_CODE_COVERAGE
-    set(_local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE "")
     foreach(_flag IN ITEMS
         /PROFILE
         /OPT:NOREF
@@ -307,63 +415,82 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
         string(APPEND _local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
     endforeach()
 
-    set(_local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_FALSE "")
     set(_local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_FALSE_DEBUG "/INCREMENTAL")
     set(_local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_FALSE_RELEASE "/INCREMENTAL:NO")
 
     # CppCommon_NO_DEBUG_INFO
-    set(_local_EXE_LINKER_flags_CppCommon_NO_DEBUG_INFO_TRUE "")
     set(_local_EXE_LINKER_flags_CppCommon_NO_DEBUG_INFO_FALSE "/DEBUG")
 
-    # When profiling, MSVC is not able to instrument x64 binaries compiled with the
-    # static CRT. If this is the case, disable the static CRT.
-    if(${CppCommon_CODE_COVERAGE} AND ${CppCommon_STATIC_CRT} AND "$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x64")
-        message(WARNING "The static CRT cannot be used with code coverage builds on x64; disabling static CRT.\n")
-        set(CppCommon_STATIC_CRT OFF)
-    endif()
+elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
+    # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
+    # |
+    # |  Clang
+    # |
+    # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
+    
+    # ----------------------------------------------------------------------
+    # |
+    # |  Compiler
+    # |
+    # ----------------------------------------------------------------------
+    
+    # ----------------------------------------------------------------------
+    # |  Static Flags
+    
+    # Debug
+    foreach(_flag IN ITEMS
+        -DDEBUG
+        -D_DEBUG
+    )
+        string(APPEND _local_CXX_flags_DEBUG " ${_flag}")
+    endforeach()
 
-    # Apply extra arguments for Clang
-    if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
-        # Standard args
-        foreach(_flag IN ITEMS
-            "-Wall"
-            "-Wno-c++98-compat-pedantic"
-            "-Wno-disabled-macro-expansion"
-            "-Wno-extra-semi"
-            "-Wno-gnu-zero-variadic-macro-arguments"
-            "-Wno-invalid-token-paste"
-            "-Wno-reserved-id-macro"
-            "-Wno-unused-command-line-argument"
-            "-Wno-unused-template"
-        )
-            string(APPEND _local_CXX_flags " ${_flag}")
-        endforeach()
+    # Release args
+    foreach(_flag IN ITEMS
+        -DNDEBUG
+        -D_NDEBUG
+        -O3                                 # Advanced optimizations
+    )
+        string(APPEND _local_CXX_flags_RELEASE " ${_flag}")
+    endforeach()
 
-        if("$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x86")
-            string(APPEND _local_CXX_flags " -m32")
-        endif()
+    # ReleaseMinSize
+    foreach(_flag IN ITEMS
+        -DNDEBUG
+        -D_NDEBUG
+        -Os
+    )
+        string(APPEND _local_CXX_flags_RELEASEMINSIZE " ${_flag}")
+    endforeach()
 
-        # Release args
-        foreach(_flag IN ITEMS
-            "-Xclang -O3"                   # Advanced optimizations
-            "-Xclang -fno-inline"           # Inline optimizations present problems with -O3
-        )
-            string(APPEND _local_CXX_flags_release " ${_flag}")
-        endforeach()
+    # ReleaseNoOpt
+    foreach(_flag IN ITEMS
+        -DNDEBUG
+        -D_NDEBUG
+    )
+        string(APPEND _local_CXX_flags_RELEASENOOPT " ${_flag}")
+    endforeach()
 
-        # CppCommon_CODE_COVERAGE
-        foreach(_flag IN ITEMS
-            "--coverage"
-        )
-            string(APPEND _local_CXX_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
-        endforeach()
+    # ----------------------------------------------------------------------
+    # |  Dynamic Flags
+    
+    # CppCommon_NO_DEBUG_INFO
+    set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE "-g")
 
-        foreach(_flag IN ITEMS
-            "clang_rt.profile-x86_64.lib"
-        )
-            string(APPEND _local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
-        endforeach()
-    endif()
+    # CppCommon_PREPROCESSOR_OUTPUT
+    set(_local_CXX_flags_CppCommon_PREPROCESSOR_OUTPUT_TRUE "-E")
+
+    # CppCommon_UNICODE
+    set(_local_CXX_flags_CppCommon_UNICODE_TRUE "-DUNICODE -D_UNICODE")
+    set(_local_CXX_flags_CppCommon_UNICODE_FALSE "-DMBCS -D_MBCS")
+
+    # CppCommon_STATIC_CRT
+    set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE "-static-libstdc++")
+
 else()
     message(FATAL_ERROR "The compiler '${CMAKE_CXX_COMPILER_ID}' is not supported.")
 endif()
@@ -373,53 +500,53 @@ endif()
 # |  Persist the static flags
 # |
 # ----------------------------------------------------------------------
-if(DEFINED _local_CXX_flags AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_UPDATED))
+if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_UPDATED)
     set(CMAKE_CXX_FLAGS ${_local_CXX_flags} CACHE string "Flags used by the CXX compiler during all builds." FORCE)
     set(_CXX_FLAGS_UPDATED true CACHE bool "Indicates that CMAKE_CXX_FLAGS has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_CXX_flags_debug AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_DEBUG_UPDATED))
-    set(CMAKE_CXX_FLAGS_DEBUG ${_local_CXX_flags_debug} CACHE string "Flags used by the CXX compiler during Debug builds." FORCE)
+if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_DEBUG_UPDATED)
+    set(CMAKE_CXX_FLAGS_DEBUG ${_local_CXX_flags_DEBUG} CACHE string "Flags used by the CXX compiler during Debug builds." FORCE)
     set(_CXX_FLAGS_DEBUG_UPDATED true CACHE bool "Indicates that CMAKE_CXX_FLAGS_DEBUG has already been updated and should not be updated during function configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_CXX_flags_release AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASE_UPDATED))
-    set(CMAKE_CXX_FLAGS_RELEASE ${_local_CXX_flags_release} CACHE string "Flags used by the CXX compiler during Release builds." FORCE)
+if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASE_UPDATED)
+    set(CMAKE_CXX_FLAGS_RELEASE ${_local_CXX_flags_RELEASE} CACHE string "Flags used by the CXX compiler during Release builds." FORCE)
     set(_CXX_FLAGS_RELEASE_UPDATED true CACHE bool "Indicates that CMAKE_CXX_FLAGS_RELEASE has already been updated and should not be updated during function configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_CXX_flags_release_min_size AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASEMINSIZE_UPDATED))
-    set(CMAKE_CXX_FLAGS_RELEASEMINSIZE ${_local_CXX_flags_release_min_size} CACHE string "Flags used by the CXX compiler during ReleaseMinSize builds." FORCE)
+if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASEMINSIZE_UPDATED)
+    set(CMAKE_CXX_FLAGS_RELEASEMINSIZE ${_local_CXX_flags_RELEASEMINSIZE} CACHE string "Flags used by the CXX compiler during ReleaseMinSize builds." FORCE)
     set(_CXX_FLAGS_RELEASEMINSIZE_UPDATED true CACHE bool "Indicates that CMAKE_CXX_FLAGS_RELEASEMINSIZE has already been updated and should not be updated during function configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_CXX_flags_release_no_opt AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASENOOPT_UPDATED))
-    set(CMAKE_CXX_FLAGS_RELEASENOOPT ${_local_CXX_flags_release_no_opt} CACHE string "Flags used by the CXX compiler during ReleaseNoOpt builds." FORCE)
+if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _CXX_FLAGS_RELEASENOOPT_UPDATED)
+    set(CMAKE_CXX_FLAGS_RELEASENOOPT ${_local_CXX_flags_RELEASENOOPT} CACHE string "Flags used by the CXX compiler during ReleaseNoOpt builds." FORCE)
     set(_CXX_FLAGS_RELEASENOOPT_UPDATED true CACHE bool "Indicates that CMAKE_CXX_FLAGS_RELEASENOOPT has already been updated and should not be updated during function configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_EXE_LINKER_flags AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_UPDATED))
+if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_UPDATED)
     set(CMAKE_EXE_LINKER_FLAGS ${_local_EXE_LINKER_flags} CACHE string "Flags used by the linker during all builds." FORCE)
     set(_LINKER_FLAGS_UPDATED true CACHE bool "Indicates that CMAKE_EXE_LINKER_FLAGS has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_EXE_LINKER_flags_debug AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_DEBUG_UPDATED))
-    set(CMAKE_EXE_LINKER_FLAGS_DEBUG ${_local_EXE_LINKER_flags_debug} CACHE string "Flags used by the linker during Debug builds." FORCE)
+if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_DEBUG_UPDATED)
+    set(CMAKE_EXE_LINKER_FLAGS_DEBUG ${_local_EXE_LINKER_flags_DEBUG} CACHE string "Flags used by the linker during Debug builds." FORCE)
     set(_LINKER_FLAGS_DEBUG_UPDATED true CACHE bool "Indicates that CMAKE_EXE_LINKER_FLAGS_DEBUG has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_EXE_LINKER_flags_release AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASE_UPDATED))
-    set(CMAKE_EXE_LINKER_FLAGS_RELEASE ${_local_EXE_LINKER_flags_release} CACHE string "Flags used by the linker during Release builds." FORCE)
+if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASE_UPDATED)
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE ${_local_EXE_LINKER_flags_RELEASE} CACHE string "Flags used by the linker during Release builds." FORCE)
     set(_LINKER_FLAGS_RELEASE_UPDATED true CACHE bool "Indicates that CMAKE_EXE_LINKER_FLAGS_RELEASE has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_EXE_LINKER_flags_release_min_size AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASEMINSIZE_UPDATED))
-    set(CMAKE_EXE_LINKER_FLAGS_RELEASEMINSIZE ${_local_EXE_LINKER_flags_release_min_size} CACHE string "Flags used by the linker during ReleaseMinSize builds." FORCE)
+if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASEMINSIZE_UPDATED)
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASEMINSIZE ${_local_EXE_LINKER_flags_RELEASEMINSIZE} CACHE string "Flags used by the linker during ReleaseMinSize builds." FORCE)
     set(_LINKER_FLAGS_RELEASEMINSIZE_UPDATED true CACHE bool "Indicates that CMAKE_EXE_LINKER_FLAGS_RELEASEMINSIZE has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
 
-if(DEFINED _local_EXE_LINKER_flags_release_no_opt AND (${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASENOOPT_UPDATED))
-    set(CMAKE_EXE_LINKER_FLAGS_RELEASENOOPT ${_local_EXE_LINKER_flags_release_no_opt} CACHE string "Flags used by the linker during ReleaseNoOpt builds." FORCE)
+if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _LINKER_FLAGS_RELEASENOOPT_UPDATED)
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASENOOPT ${_local_EXE_LINKER_flags_RELEASENOOPT} CACHE string "Flags used by the linker during ReleaseNoOpt builds." FORCE)
     set(_LINKER_FLAGS_RELEASENOOPT_UPDATED true CACHE bool "Indicates that CMAKE_EXE_LINKER_FLAGS_RELEASENOOPT has already been updated and should not be updated during future configuration/generation cycles." FORCE)
 endif()
 
@@ -440,25 +567,21 @@ foreach(_flag_prefix IN ITEMS
         CppCommon_PREPROCESSOR_OUTPUT
     )
         set(_local_flag_name "_local_${_flag_prefix}_flags_${_flag_type}")
-        if(DEFINED "${_local_flag_name}")
-            set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}")
-            if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
-                set("${_cached_flag_name}" "${${_local_flag_name}}" CACHE string "" FORCE)
-            endif()
+        set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}")
+        if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
+            set("${_cached_flag_name}" "${${_local_flag_name}}" CACHE string "" FORCE)
         endif()
-
+        
         foreach(_boolean_type IN ITEMS
             TRUE
             FALSE
         )
             set(_local_flag_name "_local_${_flag_prefix}_flags_${_flag_type}_${_boolean_type}") 
-            if(DEFINED "${_local_flag_name}")
-                set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}")
-                if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
-                    set("${_cached_flag_name}" "${${_local_flag_name}}" CACHE string "" FORCE)
-                endif()
+            set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}")
+            if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
+                set("${_cached_flag_name}" "${${_local_flag_name}}" CACHE string "" FORCE)
             endif()
-
+        
             foreach(_configuration_type IN ITEMS
                 DEBUG
                 RELEASE
@@ -466,11 +589,9 @@ foreach(_flag_prefix IN ITEMS
                 RELEASENOOPT
             )
                 set(_local_flag_name "_local_${_flag_prefix}_flags_${_flag_type}_${_boolean_type}_${_configuration_type}")
-                if(DEFINED "${_local_flag_name}")
-                    set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}_${_configuration_type}")
-                    if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
-                        set("${_cached_flag_name}" "${${_local_flag_name}}" CACHE string "" FORCE)
-                    endif()
+                set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}_${_configuration_type}")
+                if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
+                    set("${_cached_flag_name}" "${${_local_flag_name}}" CACHE string "" FORCE)
                 endif()
             endforeach()
         endforeach()
@@ -494,7 +615,7 @@ foreach(_flag_prefix IN ITEMS
         CppCommon_PREPROCESSOR_OUTPUT
     )
         set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}")
-        if(DEFINED "${_cached_flag_name}")
+        if(NOT "${_cached_flag_name}" STREQUAL "")
             string(APPEND CMAKE_${_flag_prefix}_FLAGS " ${${_cached_flag_name}}")
         endif()
 
@@ -507,7 +628,7 @@ foreach(_flag_prefix IN ITEMS
                 ("${_boolean_type}" MATCHES "FALSE" AND NOT "${${_flag_type}}")
             ) 
                 set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}")
-                if(DEFINED "${_cached_flag_name}")
+                if(NOT "${_cached_flag_name}" STREQUAL "")
                     string(APPEND CMAKE_${_flag_prefix}_FLAGS " ${${_cached_flag_name}}")
                 endif()
 
@@ -518,7 +639,7 @@ foreach(_flag_prefix IN ITEMS
                     RELEASENOOPT
                 )
                     set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}_${_config_type}")
-                    if(DEFINED "${_cached_flag_name}")
+                    if(NOT "${_cached_flag_name}" STREQUAL "")
                         string(APPEND CMAKE_${_flag_prefix}_FLAGS_${_config_type} " ${${_cached_flag_name}}")
                     endif()
                 endforeach()
