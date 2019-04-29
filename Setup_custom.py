@@ -152,7 +152,7 @@ def GetCustomActions(debug, verbose, explicit_configurations):
 
     for tool, version_infos in _CUSTOM_DATA:
         for version, operating_system_infos in version_infos:
-            for operating_system, hash in operating_system_infos:
+            for operating_system, hash, binary_file_or_dir in operating_system_infos:
                 if CurrentShell.CategoryName != operating_system:
                     continue
 
@@ -178,5 +178,15 @@ def GetCustomActions(debug, verbose, explicit_configurations):
                         ),
                     ),
                 )
+
+                if binary_file_or_dir is not None:
+                    fullpath = os.path.join(tool_dir, binary_file_or_dir)
+                    
+                    if os.path.isdir(fullpath):
+                        actions.append(CurrentShell.Commands.Execute('chmod a+x "{}/*"'.format(fullpath)))
+                    elif os.path.isfile(fullpath):
+                        actions.append(CurrentShell.Commands.Execute('chmod a+x "{}"'.format(fullpath)))
+                    else:
+                        assert False, fullpath
 
     return actions
