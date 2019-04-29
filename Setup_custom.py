@@ -183,7 +183,7 @@ def GetCustomActions(debug, verbose, explicit_configurations):
                     fullpath = os.path.join(tool_dir, binary_file_or_dir)
                     
                     if os.path.isdir(fullpath):
-                        actions.append(CurrentShell.Commands.Execute('chmod a+x "{}/*"'.format(fullpath)))
+                        actions.append(CurrentShell.Commands.Execute('chmod --recursive a+x "{}"'.format(fullpath)))
                     elif os.path.isfile(fullpath):
                         actions.append(CurrentShell.Commands.Execute('chmod a+x "{}"'.format(fullpath)))
                     else:
