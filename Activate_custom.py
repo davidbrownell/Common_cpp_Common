@@ -73,7 +73,7 @@ def GetCustomActions(
     else:
         for tool, version_infos in _CUSTOM_DATA:
             for version, operating_system_infos in version_infos:
-                for operating_system, hash, binary_file_or_dir in operating_system_infos:
+                for operating_system, hash in operating_system_infos:
                     if CurrentShell.CategoryName != operating_system:
                         continue
 
