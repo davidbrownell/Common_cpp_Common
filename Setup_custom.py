@@ -96,45 +96,22 @@ def GetDependencies():
     (aka is configurable) or a single Configuration if not.
     """
 
-    # To support multiple configurations...
-    return OrderedDict(
-        [
-            (
-                "x64",
-                Configuration(
-                    "x64",
-                    [
-                        Dependency(
-                            "0EAA1DCF22804F90AD9F5A3B85A5D706",                                                     # Id for Common_Environment; found in <Common_Environment>/__RepositoryId__
-                            "Common_Environment",                                                                   # Name used if Common_Environment cannot be found during setup
-                            "python36",                                                                             # Configuration value used when activating Common_Environment (can be None or skipped for repos that only support a single configuration)
-                            lambda scm_or_none: "https://github.com/davidbrownell/Common_cpp_Common.git"
-                            if scm_or_none is None or scm_or_none.Name != "Mercurial"
-                            else "ssh://{mercurial_ssh_config_name}/d:/Mercurial/Code/v3/Common/Common_cpp_Common", # Uri for repo; can be string or def Func(scm_or_none) -> string
-                        ),
-                                                                                                                    # Other dependencies go here (if any)
-                    ],
-                ),
-            ),
-            (
-                "x86",
-                Configuration(
-                    "x86",
-                    [
-                        Dependency(
-                            "0EAA1DCF22804F90AD9F5A3B85A5D706",                                                     # Id for Common_Environment; found in <Common_Environment>/__RepositoryId__
-                            "Common_Environment",                                                                   # Name used if Common_Environment cannot be found during setup
-                            "python36",                                                                             # Configuration value used when activating Common_Environment (can be None or skipped for repos that only support a single configuration)
-                            lambda scm_or_none: "https://github.com/davidbrownell/Common_cpp_Common.git"
-                            if scm_or_none is None or scm_or_none.Name != "Mercurial"
-                            else "ssh://{mercurial_ssh_config_name}/d:/Mercurial/Code/v3/Common/Common_cpp_Common", # Uri for repo; can be string or def Func(scm_or_none) -> string
-                        ),
-                                                                                                                    # Other dependencies go here (if any)
-                    ],
-                ),
-            ),
-        ],
-    )
+    d = OrderedDict()
+
+    if CurrentShell.CategoryName == "Windows":
+        architectures = ["x64", "x86"]
+    else:
+        # Cross compiling on Linux is much more difficult on Linux than it is on
+        # Windows. Only support the current architecture.
+        architectures = [CurrentShell.Architecture]
+
+    for architecture in architectures:
+        d[architecture] = Configuration(
+            architecture,
+            [Dependency("0EAA1DCF22804F90AD9F5A3B85A5D706", "Common_Environment", "python36", "https://github.com/davidbrownell/Common_Environment_v3.git")],
+        )
+
+    return d
 
 
 # ----------------------------------------------------------------------
