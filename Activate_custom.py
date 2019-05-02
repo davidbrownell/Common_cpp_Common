@@ -80,9 +80,6 @@ def GetCustomActions(
                     tool_dir = os.path.join(_script_dir, "Tools", tool, version, operating_system)
                     assert os.path.isdir(tool_dir), tool_dir
 
-                    if not actions:
-                        actions.append(CurrentShell.Commands.Message(""))
-
                     actions.append(
                         CurrentShell.Commands.Execute(
                             'python "{script}" Verify "{tool} - {version}" "{dir}" {hash}'.format(
@@ -99,8 +96,6 @@ def GetCustomActions(
                             ),
                         ),
                     )
-
-            actions.append(CurrentShell.Commands.Message(""))
 
     # Get the cmake path
     cmake_dirs = []
