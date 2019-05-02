@@ -220,11 +220,21 @@ if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
     # |  Dynamic Flags
     
     # CppCommon_CODE_COVERAGE
-    foreach(_flag IN ITEMS
-        clang_rt.profile-x86_64.lib
-    )
-        string(APPEND _local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
-    endforeach()
+    if(WIN32)
+        foreach(_flag IN ITEMS
+            clang_rt.profile-x86_64.lib
+        )
+            string(APPEND _local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
+        endforeach()
+    else()
+        message(FATAL_ERROR "TODO: Code coverage with clang doesn't work at this time")
+
+        foreach(_flag IN ITEMS
+            libclang_rt.profile-x86_64.a
+        )
+            string(APPEND _local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
+        endforeach()
+    endif()
 endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AND _compiler_basename MATCHES "clang-cl.exe"))
