@@ -1,0 +1,11 @@
+filter:
+  includes: 
+    - ClassPrefix::*
+  excludes:
+    - Catch2::*
+    - std::*
+
+named_filters:
+  - glob: "*.h"
+    excludes:
+      - details::*
