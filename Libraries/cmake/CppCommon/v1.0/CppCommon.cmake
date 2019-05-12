@@ -183,6 +183,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
     # ----------------------------------------------------------------------
     # |  Static Flags
     foreach(_flag IN ITEMS
+        -W
         -Wall
         -Wno-c++98-compat-pedantic
         -Wno-disabled-macro-expansion
@@ -196,8 +197,12 @@ if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
         string(APPEND _local_CXX_flags " ${_flag}")
     endforeach()
 
-    if("$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x86")
+    if("$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x64")
+        string(APPEND _local_CXX_flags " -m64")
+    elseif("$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x86")
         string(APPEND _local_CXX_flags " -m32")
+    else()
+        message(FATAL_ERROR "'$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}' is not recognized")
     endif()
 
     # ----------------------------------------------------------------------
@@ -227,7 +232,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
             string(APPEND _local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
         endforeach()
     else()
-        message(FATAL_ERROR "TODO: Code coverage with clang doesn't work at this time")
+        # TODO message(FATAL_ERROR "TODO: Code coverage with clang doesn't work at this time")
 
         foreach(_flag IN ITEMS
             libclang_rt.profile-x86_64.a
@@ -432,6 +437,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
     set(_local_EXE_LINKER_flags_CppCommon_NO_DEBUG_INFO_FALSE "/DEBUG")
 
 elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
+    
     # ----------------------------------------------------------------------
     # ----------------------------------------------------------------------
     # ----------------------------------------------------------------------
@@ -450,11 +456,22 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
     
     # ----------------------------------------------------------------------
     # |  Static Flags
-    
+    foreach(_flag IN ITEMS
+        -fasynchronous-unwind-tables        # Increased reliability of backtraces
+        -fexceptions                        # Enable table-based thread cancellation
+        -fpic                               # Position Independent Code
+        -fvisibility=hidden                 # Symbols in shared libraries are hidden by default (which is consistent with Windows)
+        -pipe                               # Avoid temporary files
+        
+    )
+        string(APPEND _local_CXX_flags " ${_flag}")
+    endforeach()
+
     # Debug
     foreach(_flag IN ITEMS
         -DDEBUG
         -D_DEBUG
+        -O0                                 # No optimizations
     )
         string(APPEND _local_CXX_flags_DEBUG " ${_flag}")
     endforeach()
@@ -463,7 +480,14 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
     foreach(_flag IN ITEMS
         -DNDEBUG
         -D_NDEBUG
+        -D_FORTIFY_SOURCE=2                 # Run-time buffer overflow detection
+        -D_GLIBCXX_ASSERTIONS               # Run-time bounds checking for C++ strings and containers
+        -fpie -WI,-pie                      # Full address space layout randomization (ASLR) for executables
+        -fstack-protector-strong            # Stack smashing protection
         -O3                                 # Advanced optimizations
+        -Wl,-z,defs                         # Detect and reject underlinking
+        -Wl,-z,now                          # Disable lazy binding
+        -Wl,-z,relro                        # Read-only segments after relocation
     )
         string(APPEND _local_CXX_flags_RELEASE " ${_flag}")
     endforeach()
@@ -472,7 +496,14 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
     foreach(_flag IN ITEMS
         -DNDEBUG
         -D_NDEBUG
-        -Os
+        -D_FORTIFY_SOURCE=2                 # Run-time buffer overflow detection
+        -D_GLIBCXX_ASSERTIONS               # Run-time bounds checking for C++ strings and containers
+        -fpie -WI,-pie                      # Full address space layout randomization (ASLR) for executables
+        -fstack-protector-strong            # Stack smashing protection
+        -Os                                 # Optimize for small code
+        -Wl,-z,defs                         # Detect and reject underlinking
+        -Wl,-z,now                          # Disable lazy binding
+        -Wl,-z,relro                        # Read-only segments after relocation
     )
         string(APPEND _local_CXX_flags_RELEASEMINSIZE " ${_flag}")
     endforeach()
@@ -481,18 +512,20 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
     foreach(_flag IN ITEMS
         -DNDEBUG
         -D_NDEBUG
+        -D_FORTIFY_SOURCE=2                 # Run-time buffer overflow detection
+        -D_GLIBCXX_ASSERTIONS               # Run-time bounds checking for C++ strings and containers
+        -fpie -WI,-pie                      # Full address space layout randomization (ASLR) for executables
+        -fstack-protector-strong            # Stack smashing protection
+        -O0                                 # No optimizations
+        -Wl,-z,defs                         # Detect and reject underlinking
+        -Wl,-z,now                          # Disable lazy binding
+        -Wl,-z,relro                        # Read-only segments after relocation
     )
         string(APPEND _local_CXX_flags_RELEASENOOPT " ${_flag}")
     endforeach()
 
     # ----------------------------------------------------------------------
     # |  Dynamic Flags
-    
-    # CppCommon_NO_DEBUG_INFO
-    set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE "-g")
-
-    # CppCommon_PREPROCESSOR_OUTPUT
-    set(_local_CXX_flags_CppCommon_PREPROCESSOR_OUTPUT_TRUE "-E")
 
     # CppCommon_UNICODE
     set(_local_CXX_flags_CppCommon_UNICODE_TRUE "-DUNICODE -D_UNICODE")
@@ -500,6 +533,17 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
 
     # CppCommon_STATIC_CRT
     set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE "-static-libstdc++")
+
+    # CppCommon_NO_DEBUG_INFO
+    foreach(_flag IN ITEMS
+        -g                                  # Generate debugging information
+        -grecord-gcc-switches               # Store compiler flags in debugging information
+    )
+        string(APPEND _local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE " ${_flag}")
+    endforeach()
+    
+    # CppCommon_PREPROCESSOR_OUTPUT
+    set(_local_CXX_flags_CppCommon_PREPROCESSOR_OUTPUT_TRUE "-E")
 
 else()
     message(FATAL_ERROR "The compiler '${CMAKE_CXX_COMPILER_ID}' is not supported.")
@@ -664,6 +708,10 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 set(CMAKE_C_FLAGS_RELEASEMINSIZE "${CMAKE_CXX_FLAGS_RELEASEMINSIZE}")
 set(CMAKE_C_FLAGS_RELEASENOOPT "${CMAKE_CXX_FLAGS_RELEASENOOPT}")
+
+# TODO: Verify Module Linker flags
+# TODO: Verify Shared Linker flags
+# TODO: Verify Static Linker flags
 
 # Handle the other linker flag types
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
