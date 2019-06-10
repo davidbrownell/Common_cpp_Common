@@ -133,9 +133,13 @@ class Compiler(
         with CallOnExit(lambda: FileSystem.RemoveTree(temp_directory)):
             dot_filename = os.path.join(temp_directory, "generated.dot")
 
+            if metadata["generator"] is None:
+                metadata["generator"] = "Ninja"
+
             command_line_options = [
                 '-S "{}"'.format(metadata["input"]),
                 '-B "{}"'.format(metadata["output_dir"]),
+                '-G {}'.format(metadata["generator"]),
                 '"--graphviz={}"'.format(dot_filename),
                 "-DCMAKE_BUILD_TYPE={}".format("Debug" if metadata["is_debug"] else "Release"),
                 "-DCppCommon_CODE_COVERAGE={}".format("ON" if metadata["is_profile"] else "OFF"),
@@ -145,9 +149,6 @@ class Compiler(
                 "-DCppCommon_STATIC_CRT={}".format("ON" if metadata["static_crt"] else "OFF"),
                 "-DCppCommon_UNICODE={}".format("ON" if metadata["use_unicode"] else "OFF"),
             ]
-
-            if metadata["generator"] is not None:
-                command_line_options.append('-G "{}"'.format(metadata["generator"]))
 
             result, output = Process.Execute("cmake {}".format(" ".join(command_line_options)))
             if result != 0:
