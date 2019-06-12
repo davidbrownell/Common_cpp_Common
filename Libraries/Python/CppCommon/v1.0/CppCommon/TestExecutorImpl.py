@@ -155,14 +155,18 @@ class TestExecutorImpl(TestExecutorImplBase):
 
                 includes, excludes = CodeCoverageFilter.GetFilters(mock_filter_filename)
 
-                covered, not_covered = code_coverage_executor.ExtractCoverageInfo(
+                this_result = code_coverage_executor.ExtractCoverageInfo(
                     coverage_output_filename,
                     output_filename,
                     includes,
                     excludes,
                     output_stream,
                 )
-                
+                if not isinstance(this_result, tuple):
+                    return this_result
+
+                covered, not_covered = this_result
+
                 all_results[task_index] = (covered, not_covered)
 
                 with nonlocals_lock:
@@ -197,9 +201,9 @@ class TestExecutorImpl(TestExecutorImplBase):
             for output_name, (covered, not_covered) in zip(output_names, all_results):
                 total_covered += covered
                 total_not_covered += not_covered
-                
+
                 result_blocks = covered + not_covered
-                
+
                 all_percentages[output_name] = (
                     (float(covered) / result_blocks if result_blocks else 0.0) * 100.0,
                     "{} of {} {} covered".format(covered, result_blocks, code_coverage_executor.Units),
@@ -212,7 +216,7 @@ class TestExecutorImpl(TestExecutorImplBase):
             execute_result.CoveragePercentages = all_percentages
 
         # ----------------------------------------------------------------------
-        
+
         Impl()
 
         execute_result.CoverageOutput = "".join(

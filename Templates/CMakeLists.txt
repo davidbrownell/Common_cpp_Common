@@ -5,22 +5,19 @@
 #       - <project_version>
 #       - <project_files>
 #
-#   [OPTIONAL]
-#       - CMAKE_CXX_STANDARD is set to C++14
-#
-
-# TODO: This needs refinement
 
 cmake_minimum_required(VERSION 3.5.0)
 
-project(<project_name> VERSION <project_version>)
+project(<project_name> VERSION <project_version> LANGUAGES CXX)
 
 set(CMAKE_MODULE_PATH "$ENV{DEVELOPMENT_ENVIRONMENT_CMAKE_MODULE_PATH}")
+set(_includes "$ENV{INCLUDE}")
+set(_libs "$ENV{LIB}")
 
 if(NOT WIN32)
     string(REPLACE ":" ";" CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}")
-    string(REPLACE ":" ";" _includes "$ENV{INCLUDE}")
-    string(REPLACE ":" ";" _libs "$ENV{LIB}")
+    string(REPLACE ":" ";" _includes "${_includes}")
+    string(REPLACE ":" ";" _libs "${_libs}")
 endif()
 
 include(CppCommon)

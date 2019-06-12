@@ -17,6 +17,7 @@
 
 import os
 import re
+import shutil
 import sys
 import textwrap
 
@@ -85,21 +86,37 @@ class Compiler(
     @staticmethod
     @Interface.override
     def RemoveTemporaryArtifacts(context):
+        output_dir = context["output_dir"]
+
+        # Move GCC-generated profile data to the output dir
+        for filename in FileSystem.WalkFiles(
+            output_dir,
+            include_file_extensions=[".gcno", ".gcda"],
+        ):
+            dest_filename = os.path.join(output_dir, os.path.basename(filename))
+            if dest_filename == filename:
+                continue
+
+            if os.path.isfile(dest_filename):
+                raise Exception("The file '{}' already exists ({})".format(dest_filename, filename))
+
+            shutil.copyfile(filename, dest_filename)
+
         for potential_dir in ["CMakeFiles", "Testing"]:
-            potential_dir = os.path.join(context["output_dir"], potential_dir)
+            potential_dir = os.path.join(output_dir, potential_dir)
             FileSystem.RemoveTree(potential_dir)
 
         for potential_file in ["CMakeCache.txt", "cmake_install.cmake", "Makefile"]:
-            potential_file = os.path.join(context["output_dir"], potential_file)
+            potential_file = os.path.join(output_dir, potential_file)
             FileSystem.RemoveFile(potential_file)
 
         remove_extensions = set([".ilk"])
 
-        for item in os.listdir(context["output_dir"]):
+        for item in os.listdir(output_dir):
             if os.path.splitext(item)[1] not in remove_extensions:
                 continue
 
-            fullpath = os.path.join(context["output_dir"], item)
+            fullpath = os.path.join(output_dir, item)
             FileSystem.RemoveFile(fullpath)
 
     # ----------------------------------------------------------------------
