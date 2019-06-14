@@ -125,7 +125,7 @@ class Compiler(
     @classmethod
     @Interface.override
     def _GetOptionalMetadata(cls):
-        return [("generator", None), ("is_debug", True), ("is_profile", False), ("disable_debug_info", False), ("static_crt", True), ("use_unicode", False)] + super(
+        return [("generator", "Ninja"), ("is_debug", True), ("is_profile", False), ("disable_debug_info", False), ("static_crt", True), ("use_unicode", False)] + super(
             Compiler,
             cls,
         )._GetOptionalMetadata()
@@ -149,9 +149,6 @@ class Compiler(
         temp_directory = CurrentShell.CreateTempDirectory()
         with CallOnExit(lambda: FileSystem.RemoveTree(temp_directory)):
             dot_filename = os.path.join(temp_directory, "generated.dot")
-
-            if metadata["generator"] is None:
-                metadata["generator"] = "Ninja"
 
             command_line_options = [
                 '-S "{}"'.format(metadata["input"]),
