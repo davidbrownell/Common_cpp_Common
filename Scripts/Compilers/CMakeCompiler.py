@@ -17,6 +17,7 @@
 
 import os
 import re
+import shutil
 import sys
 import textwrap
 
@@ -85,21 +86,37 @@ class Compiler(
     @staticmethod
     @Interface.override
     def RemoveTemporaryArtifacts(context):
+        output_dir = context["output_dir"]
+
+        # Move GCC-generated profile data to the output dir
+        for filename in FileSystem.WalkFiles(
+            output_dir,
+            include_file_extensions=[".gcno", ".gcda"],
+        ):
+            dest_filename = os.path.join(output_dir, os.path.basename(filename))
+            if dest_filename == filename:
+                continue
+
+            if os.path.isfile(dest_filename):
+                raise Exception("The file '{}' already exists ({})".format(dest_filename, filename))
+
+            shutil.copyfile(filename, dest_filename)
+
         for potential_dir in ["CMakeFiles", "Testing"]:
-            potential_dir = os.path.join(context["output_dir"], potential_dir)
+            potential_dir = os.path.join(output_dir, potential_dir)
             FileSystem.RemoveTree(potential_dir)
 
         for potential_file in ["CMakeCache.txt", "cmake_install.cmake", "Makefile"]:
-            potential_file = os.path.join(context["output_dir"], potential_file)
+            potential_file = os.path.join(output_dir, potential_file)
             FileSystem.RemoveFile(potential_file)
 
         remove_extensions = set([".ilk"])
 
-        for item in os.listdir(context["output_dir"]):
+        for item in os.listdir(output_dir):
             if os.path.splitext(item)[1] not in remove_extensions:
                 continue
 
-            fullpath = os.path.join(context["output_dir"], item)
+            fullpath = os.path.join(output_dir, item)
             FileSystem.RemoveFile(fullpath)
 
     # ----------------------------------------------------------------------
@@ -108,7 +125,7 @@ class Compiler(
     @classmethod
     @Interface.override
     def _GetOptionalMetadata(cls):
-        return [("generator", None), ("is_debug", True), ("is_profile", False), ("disable_debug_info", False), ("static_crt", True), ("use_unicode", False)] + super(
+        return [("generator", "Ninja"), ("is_debug", True), ("is_profile", False), ("disable_debug_info", False), ("static_crt", True), ("use_unicode", False)] + super(
             Compiler,
             cls,
         )._GetOptionalMetadata()
@@ -136,6 +153,7 @@ class Compiler(
             command_line_options = [
                 '-S "{}"'.format(metadata["input"]),
                 '-B "{}"'.format(metadata["output_dir"]),
+                '-G {}'.format(metadata["generator"]),
                 '"--graphviz={}"'.format(dot_filename),
                 "-DCMAKE_BUILD_TYPE={}".format("Debug" if metadata["is_debug"] else "Release"),
                 "-DCppCommon_CODE_COVERAGE={}".format("ON" if metadata["is_profile"] else "OFF"),
@@ -145,9 +163,6 @@ class Compiler(
                 "-DCppCommon_STATIC_CRT={}".format("ON" if metadata["static_crt"] else "OFF"),
                 "-DCppCommon_UNICODE={}".format("ON" if metadata["use_unicode"] else "OFF"),
             ]
-
-            if metadata["generator"] is not None:
-                command_line_options.append('-G "{}"'.format(metadata["generator"]))
 
             result, output = Process.Execute("cmake {}".format(" ".join(command_line_options)))
             if result != 0:

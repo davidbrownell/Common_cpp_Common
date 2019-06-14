@@ -14,7 +14,10 @@
 # |
 # ----------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.5)
-cmake_policy(SET CMP0057 NEW)
+
+cmake_policy(SET CMP0056 NEW)               # Honor link flags
+cmake_policy(SET CMP0057 NEW)               # Support IN_LIST
+cmake_policy(SET CMP0066 NEW)               # Honor compile flags
 
 option(
     CppCommon_CMAKE_FORCE_FLAG_GENERATION
@@ -59,7 +62,7 @@ option(
 )
 
 # CMAKE_CONFIGURATION_TYPES
-set(_valid_configuration_types 
+set(_valid_configuration_types
     Debug                                   # Standard Debug build
     Release                                 # Release build optimizing for speed
     ReleaseMinSize                          # Release build optimizing for code size
@@ -73,7 +76,7 @@ if(NOT CMAKE_CONFIGURATION_TYPES)
     #   - `ReleaseNoOpt` has been added
     #
     set(CMAKE_CONFIGURATION_TYPES ${_valid_configuration_types})
-    
+
     set(
         CMAKE_CONFIGURATION_TYPES
         "${CMAKE_CONFIGURATION_TYPES}"
@@ -105,7 +108,7 @@ foreach(_prefix IN ITEMS
     CMAKE_SHARED_LINKER_FLAGS_
     CMAKE_STATIC_LINKER_FLAGS_
 )
-    foreach(_configuration_type IN ITEMS 
+    foreach(_configuration_type IN ITEMS
         MINSIZEREL
         RELWITHDEBINFO
     )
@@ -207,7 +210,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
 
     # ----------------------------------------------------------------------
     # |  Dynamic Flags
-    
+
     # CppCommon_CODE_COVERAGE
     foreach(_flag IN ITEMS
         --coverage
@@ -220,10 +223,10 @@ if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
     # |  Linker
     # |
     # ----------------------------------------------------------------------
-    
+
     # ----------------------------------------------------------------------
     # |  Dynamic Flags
-    
+
     # CppCommon_CODE_COVERAGE
     if(WIN32)
         foreach(_flag IN ITEMS
@@ -232,12 +235,10 @@ if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
             string(APPEND _local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
         endforeach()
     else()
-        # TODO message(FATAL_ERROR "TODO: Code coverage with clang doesn't work at this time")
-
         foreach(_flag IN ITEMS
-            libclang_rt.profile-x86_64.a
+            clang_rt.profile-x86_64
         )
-            string(APPEND _local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
+            string(APPEND _local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE " -l${_flag}")
         endforeach()
     endif()
 endif()
@@ -265,7 +266,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
     # |  Compiler
     # |
     # ----------------------------------------------------------------------
-    
+
     # ----------------------------------------------------------------------
     # |  Static Flags
     foreach(_flag IN ITEMS
@@ -289,7 +290,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
     )
         string(APPEND _local_CXX_flags " ${_flag}")
     endforeach()
-    
+
     # Debug
     foreach(_flag IN ITEMS
         /DDEBUG
@@ -305,7 +306,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
     foreach(_flag IN ITEMS
         /DNDEBUG
         /D_NDEBUG
-        /GL                                 # enable link-time code generation 
+        /GL                                 # enable link-time code generation
         /Gy                                 # separate functions for linker
         /O2                                 # maximum optimizations (favor speed)
         /Ob2                                # inline expansion (default n=0)
@@ -348,7 +349,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
 
     # ----------------------------------------------------------------------
     # |  Dynamic Flags
-    
+
     # CppCommon_UNICODE
     set(_local_CXX_flags_CppCommon_UNICODE_TRUE "/DUNICODE /D_UNICODE")
     set(_local_CXX_flags_CppCommon_UNICODE_FALSE "/DMBCS /D_MBCS")
@@ -370,7 +371,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
     )
         string(APPEND _local_CXX_flags_CppCommon_CODE_COVERAGE_FALSE " ${_flag}")
     endforeach()
-    
+
     # CppCommon_NO_DEBUG_INFO
     set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_DEBUG "/ZI")
     set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASE "/Zi")
@@ -379,7 +380,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
 
     # CppCommon_PREPROCESSOR_OUTPUT
     set(_local_CXX_flags_CppCommon_PREPROCESSOR_OUTPUT_TRUE "/P")
-    
+
     # ----------------------------------------------------------------------
     # |
     # |  Linker
@@ -391,7 +392,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
     foreach(_flag IN ITEMS
         /DYNAMICBASE                        # Randomized base address
         /MANIFEST                           # Creates a side-by-side manifest file and optionally embeds it in the binary.
-        /NXCOMPAT                           # Data Execution Prevention 
+        /NXCOMPAT                           # Data Execution Prevention
         /MANIFESTUAC:"level='asInvoker' uiAccess='false'"   # Specifies whether User Account Control (UAC) information is embedded in the program manifest.
         /TLBID:1                            # Specifies the resource ID of the linker-generated type library.
     )
@@ -408,7 +409,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
     endif()
 
     # The following flags are valid for both MSVC and Clang
-    foreach(_flag IN ITEMS 
+    foreach(_flag IN ITEMS
         /OPT:ICF                            # Enable COMDAT Folding
         /OPT:REF                            # References
     )
@@ -420,7 +421,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
 
     # ----------------------------------------------------------------------
     # |  Dynamic Flags
-    
+
     # CppCommon_CODE_COVERAGE
     foreach(_flag IN ITEMS
         /PROFILE
@@ -437,7 +438,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AN
     set(_local_EXE_LINKER_flags_CppCommon_NO_DEBUG_INFO_FALSE "/DEBUG")
 
 elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
-    
+
     # ----------------------------------------------------------------------
     # ----------------------------------------------------------------------
     # ----------------------------------------------------------------------
@@ -447,13 +448,13 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
     # ----------------------------------------------------------------------
     # ----------------------------------------------------------------------
     # ----------------------------------------------------------------------
-    
+
     # ----------------------------------------------------------------------
     # |
     # |  Compiler
     # |
     # ----------------------------------------------------------------------
-    
+
     # ----------------------------------------------------------------------
     # |  Static Flags
     foreach(_flag IN ITEMS
@@ -462,7 +463,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
         -fpic                               # Position Independent Code
         -fvisibility=hidden                 # Symbols in shared libraries are hidden by default (which is consistent with Windows)
         -pipe                               # Avoid temporary files
-        
+
     )
         string(APPEND _local_CXX_flags " ${_flag}")
     endforeach()
@@ -541,7 +542,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
     )
         string(APPEND _local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE " ${_flag}")
     endforeach()
-    
+
     # CppCommon_PREPROCESSOR_OUTPUT
     set(_local_CXX_flags_CppCommon_PREPROCESSOR_OUTPUT_TRUE "-E")
 
@@ -613,7 +614,7 @@ foreach(_flag_prefix IN ITEMS
     CXX
     EXE_LINKER
 )
-    foreach(_flag_type IN ITEMS 
+    foreach(_flag_type IN ITEMS
         CppCommon_UNICODE
         CppCommon_STATIC_CRT
         CppCommon_CODE_COVERAGE
@@ -625,17 +626,17 @@ foreach(_flag_prefix IN ITEMS
         if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
             set("${_cached_flag_name}" "${${_local_flag_name}}" CACHE string "" FORCE)
         endif()
-        
+
         foreach(_boolean_type IN ITEMS
             TRUE
             FALSE
         )
-            set(_local_flag_name "_local_${_flag_prefix}_flags_${_flag_type}_${_boolean_type}") 
+            set(_local_flag_name "_local_${_flag_prefix}_flags_${_flag_type}_${_boolean_type}")
             set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}")
             if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_cached_flag_name})
                 set("${_cached_flag_name}" "${${_local_flag_name}}" CACHE string "" FORCE)
             endif()
-        
+
             foreach(_configuration_type IN ITEMS
                 DEBUG
                 RELEASE
@@ -661,7 +662,7 @@ foreach(_flag_prefix IN ITEMS
     CXX
     EXE_LINKER
 )
-    foreach(_flag_type IN ITEMS 
+    foreach(_flag_type IN ITEMS
         CppCommon_UNICODE
         CppCommon_STATIC_CRT
         CppCommon_CODE_COVERAGE
@@ -673,14 +674,14 @@ foreach(_flag_prefix IN ITEMS
             string(APPEND CMAKE_${_flag_prefix}_FLAGS " ${${_cached_flag_name}}")
         endif()
 
-        foreach(_boolean_type IN ITEMS 
+        foreach(_boolean_type IN ITEMS
             TRUE
             FALSE
         )
             if(
                 ("${_boolean_type}" MATCHES "TRUE" AND "${${_flag_type}}") OR
                 ("${_boolean_type}" MATCHES "FALSE" AND NOT "${${_flag_type}}")
-            ) 
+            )
                 set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}")
                 if(NOT "${_cached_flag_name}" STREQUAL "")
                     string(APPEND CMAKE_${_flag_prefix}_FLAGS " ${${_cached_flag_name}}")

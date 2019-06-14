@@ -62,7 +62,7 @@ def Generate(
     if test and not build:
         raise CommandLine.UsageException("'/build' must be provided if '/test' is provided")
 
-    command_line_template = 'cmake -G {generator} -S "{working_dir}" -B "{{build_dir}}" -DCMAKE_BUILD_TYPE={{configuration}}{params} {root_dir}'.format(
+    command_line_template = 'cmake -G {generator} -S "{working_dir}" -B "{{build_dir}}" -DCMAKE_BUILD_TYPE={{configuration}} {params} {root_dir}'.format(
         generator=generator,
         working_dir=working_dir,
         params=" ".join(cmake_params),
@@ -115,7 +115,7 @@ def Generate(
                     import CommonEnvironment
                     from CommonEnvironment import FileSystem
                     from CommonEnvironment.StreamDecorator import StreamDecorator
-                    
+
                     # ----------------------------------------------------------------------
                     _script_fullpath                            = CommonEnvironment.ThisFullpath()
                     _script_dir, _script_name                   = os.path.split(_script_fullpath)
@@ -155,7 +155,7 @@ def Generate(
 
             with test_lock:
                 on_status_update("Testing")
-                    
+
                 result = _TestImpl(build_dir, output_stream)
                 if result != 0:
                     return result
@@ -308,9 +308,9 @@ def _Impl(working_dir, output_stream, verbose, callback_func):
         def Impl(task_index, output_stream, on_status_update):
             configuration = configuration_types[task_index]
             build_dir = os.path.join(*([working_dir] + build_dir_prefix + [configuration]))
-            
+
             return callback_func(
-                test_lock, 
+                test_lock,
                 configuration,
                 build_dir,
                 output_stream,
@@ -339,7 +339,7 @@ def _PrintHeader(name, output_stream):
             ----------------------------------------------------------------------
             |  {}
             ----------------------------------------------------------------------
-            
+
             """,
         ).format(name),
     )
