@@ -139,7 +139,7 @@ class Compiler(
     # ----------------------------------------------------------------------
     @classmethod
     @Interface.override
-    def _CreateContext(cls, metadata):
+    def _CreateContext(cls, metadata, status_stream):
         if "output_dir" not in metadata:
             return metadata
 
@@ -193,7 +193,7 @@ class Compiler(
 
             metadata["output_filenames"] = output_filenames
 
-        return super(Compiler, cls)._CreateContext(metadata)
+        return super(Compiler, cls)._CreateContext(metadata, status_stream)
 
 
 # ----------------------------------------------------------------------
