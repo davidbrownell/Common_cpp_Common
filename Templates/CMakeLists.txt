@@ -35,10 +35,10 @@ enable_testing()
 foreach(_test_name IN ITEMS
     <file>_UnitTest
 )
-    add_executable(${_name ${_name}.cpp)
+    add_executable(${_test_name} ${_test_name}.cpp)
 
-    target_include_directories(${_name} PRIVATE ${_includes})
-    target_link_directories(${_name} PRIVATE ${_libs})
+    target_include_directories(${_test_name} PRIVATE ${_includes})
+    target_link_directories(${_test_name} PRIVATE ${_libs})
 
-    add_test(NAME ${_name} COMMAND ${_name} --success)
+    add_test(NAME ${_test_name} COMMAND ${_test_name} --success)
 endforeach()
