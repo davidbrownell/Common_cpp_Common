@@ -20,11 +20,13 @@
 # ----------------------------------------------------------------------
 # |  Static Flags
 foreach(_flag IN ITEMS
+    -fmacro-backtrace-limit=0
     -W
     -Wall
     -Wno-c++98-compat-pedantic
     -Wno-disabled-macro-expansion
     -Wno-extra-semi
+    -Wno-global-constructors
     -Wno-gnu-zero-variadic-macro-arguments
     -Wno-invalid-token-paste
     -Wno-missing-prototypes
