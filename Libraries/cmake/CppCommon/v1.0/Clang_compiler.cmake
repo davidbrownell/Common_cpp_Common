@@ -19,10 +19,8 @@
 foreach(_flag IN ITEMS
     -fasynchronous-unwind-tables        # Increased reliability of backtraces
     -fexceptions                        # Enable table-based thread cancellation
-    -fpic                               # Position Independent Code
     -fvisibility=hidden                 # Symbols in shared libraries are hidden by default (which is consistent with Windows)
     -pipe                               # Avoid temporary files
-
 )
     string(APPEND _local_CXX_flags " ${_flag}")
 endforeach()
@@ -42,7 +40,6 @@ foreach(_flag IN ITEMS
     -D_NDEBUG
     -D_FORTIFY_SOURCE=2                 # Run-time buffer overflow detection
     -D_GLIBCXX_ASSERTIONS               # Run-time bounds checking for C++ strings and containers
-    -fpie -Wl,-pie                      # Full address space layout randomization (ASLR) for executables
     -fstack-protector-strong            # Stack smashing protection
     -O3                                 # Advanced optimizations
     -Wl,-z,defs                         # Detect and reject underlinking
@@ -58,7 +55,6 @@ foreach(_flag IN ITEMS
     -D_NDEBUG
     -D_FORTIFY_SOURCE=2                 # Run-time buffer overflow detection
     -D_GLIBCXX_ASSERTIONS               # Run-time bounds checking for C++ strings and containers
-    -fpie -Wl,-pie                      # Full address space layout randomization (ASLR) for executables
     -fstack-protector-strong            # Stack smashing protection
     -Os                                 # Optimize for small code
     -Wl,-z,defs                         # Detect and reject underlinking
@@ -74,7 +70,6 @@ foreach(_flag IN ITEMS
     -D_NDEBUG
     -D_FORTIFY_SOURCE=2                 # Run-time buffer overflow detection
     -D_GLIBCXX_ASSERTIONS               # Run-time bounds checking for C++ strings and containers
-    -fpie -Wl,-pie                      # Full address space layout randomization (ASLR) for executables
     -fstack-protector-strong            # Stack smashing protection
     -O0                                 # No optimizations
     -Wl,-z,defs                         # Detect and reject underlinking
@@ -101,6 +96,15 @@ foreach(_flag IN ITEMS
 )
     string(APPEND _local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE " ${_flag}")
 endforeach()
+
+# CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION
+set(_local_CXX_flags_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION_TRUE_RELEASE "-fPIC -fpie -Wl,-pie")
+set(_local_CXX_flags_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION_TRUE_RELEASEMINSIZE "-fPIC -fpie -Wl,-pie")
+set(_local_CXX_flags_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION_TRUE_RELEASENOOPT "-fPIC -fpie -Wl,-pie")
+
+set(_local_EXE_LINKER_flags_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION_TRUE_RELEASE "-pie")
+set(_local_EXE_LINKER_flags_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION_TRUE_RELEASEMINSIZE "-pie")
+set(_local_EXE_LINKER_flags_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION_TRUE_RELEASENOOPT "-pie")
 
 # CppCommon_PREPROCESSOR_OUTPUT
 set(_local_CXX_flags_CppCommon_PREPROCESSOR_OUTPUT_TRUE "-E")

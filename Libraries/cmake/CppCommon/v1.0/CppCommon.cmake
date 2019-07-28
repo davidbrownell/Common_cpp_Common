@@ -56,6 +56,12 @@ option(
 )
 
 option(
+    CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION
+    "Do not generate code with Address Space Layout Randomization (ASLR). This should not be enabled unless it is possible to compile dependencies with ASLR."
+    "OFF"
+)
+
+option(
     CppCommon_PREPROCESSOR_OUTPUT
     "Generate preprocessor output"
     "OFF"
@@ -133,6 +139,7 @@ foreach(_flag_prefix IN ITEMS
         CppCommon_STATIC_CRT
         CppCommon_CODE_COVERAGE
         CppCommon_NO_DEBUG_INFO
+        CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION
         CppCommon_PREPROCESSOR_OUTPUT
     )
         foreach(_boolean_type IN ITEMS
@@ -248,6 +255,7 @@ foreach(_flag_prefix IN ITEMS
         CppCommon_STATIC_CRT
         CppCommon_CODE_COVERAGE
         CppCommon_NO_DEBUG_INFO
+        CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION
         CppCommon_PREPROCESSOR_OUTPUT
     )
         set(_local_flag_name "_local_${_flag_prefix}_flags_${_flag_type}")
@@ -296,6 +304,7 @@ foreach(_flag_prefix IN ITEMS
         CppCommon_STATIC_CRT
         CppCommon_CODE_COVERAGE
         CppCommon_NO_DEBUG_INFO
+        CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION
         CppCommon_PREPROCESSOR_OUTPUT
     )
         set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}")
