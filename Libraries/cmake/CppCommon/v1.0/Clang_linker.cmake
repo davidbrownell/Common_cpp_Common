@@ -17,7 +17,8 @@
 # ----------------------------------------------------------------------
 # |  Static Flags
 foreach(_flag IN ITEMS
-    -pie                                    # Full address space layout randomization (ASLR) for executables
 )
     string(APPEND _local_EXE_LINKER_flags_RELEASE " ${_flag}")
+    string(APPEND _local_EXE_LINKER_flags_RELEASEMINSIZE " ${_flag}")
+    string(APPEND _local_EXE_LINKER_flags_RELEASENOOPT " ${_flag}")
 endforeach()
