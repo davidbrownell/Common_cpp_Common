@@ -169,17 +169,17 @@ get_filename_component(_compiler_basename "${CMAKE_CXX_COMPILER}" NAME)
 # |
 # ----------------------------------------------------------------------
 if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
-    include(${CMAKE_CURRENT_LIST_DIR}/Clang_compiler_common.cmake)
-    include(${CMAKE_CURRENT_LIST_DIR}/Clang_linker_common.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/Compilers/Clang_compiler_common.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/Compilers/Clang_linker_common.cmake)
 endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AND _compiler_basename MATCHES "clang-cl.exe"))
-    include(${CMAKE_CURRENT_LIST_DIR}/MSVC_compiler.cmake)
-    include(${CMAKE_CURRENT_LIST_DIR}/MSVC_linker.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/Compilers/MSVC_compiler.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/Compilers/MSVC_linker.cmake)
 
 elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
-    include(${CMAKE_CURRENT_LIST_DIR}/Clang_compiler.cmake)
-    include(${CMAKE_CURRENT_LIST_DIR}/Clang_linker.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/Compilers/Clang_compiler.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/Compilers/Clang_linker.cmake)
 
 else()
     message(FATAL_ERROR "The compiler '${CMAKE_CXX_COMPILER_ID}' is not supported.")
