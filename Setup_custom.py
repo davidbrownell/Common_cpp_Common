@@ -23,6 +23,7 @@
 # ----------------------------------------------------------------------
 
 import os
+import shutil
 import sys
 
 from collections import OrderedDict
@@ -119,7 +120,7 @@ def GetCustomActions(debug, verbose, explicit_configurations):
     """
     Returns an action or list of actions that should be invoked as part of the setup process.
 
-    Actions are generic command line statements defined in 
+    Actions are generic command line statements defined in
     <Common_Environment>/Libraries/Python/CommonEnvironment/v1.0/CommonEnvironment/Shell/Commands/__init__.py
     that are converted into statements appropriate for the current scripting language (in most
     cases, this is Bash on Linux systems and Batch or PowerShell on Windows systems.
@@ -136,7 +137,7 @@ def GetCustomActions(debug, verbose, explicit_configurations):
                 tool_dir = os.path.join(_script_dir, "Tools", tool, version, operating_system)
                 assert os.path.isdir(tool_dir), tool_dir
 
-                actions.append(
+                actions += [
                     CurrentShell.Commands.Execute(
                         'python "{script}" Install "{tool} - {version}" "{uri}" "{dir}" "/unique_id={hash}" /unique_id_is_hash'.format(
                             script=os.path.join(
@@ -154,6 +155,25 @@ def GetCustomActions(debug, verbose, explicit_configurations):
                             hash=hash,
                         ),
                     ),
-                )
+                ]
+
+    # Rather than creating new Install.7z files for cmake, add extra modules here
+    source_dir = os.path.join(_script_dir, "Tools", "cmake", "v3.13.4", "customizations")
+    assert os.path.isdir(source_dir), source_dir
+
+    dest_dir = os.path.join(
+        _script_dir,
+        "Tools",
+        "cmake",
+        "v3.13.4",
+        CurrentShell.CategoryName,
+        os.getenv("DEVELOPMENT_ENVIRONMENT_ENVIRONMENT_NAME"),
+        "share",
+        "cmake-3.13",
+        "Modules",
+    )
+
+    for filename in CommonEnvironmentImports.FileSystem.WalkFiles(source_dir):
+        shutil.copyfile(filename, os.path.join(dest_dir, os.path.basename(filename)))
 
     return actions
