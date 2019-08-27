@@ -43,7 +43,7 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 # <Wildcard import> pylint: disable = W0401
 # <Unused argument> pylint: disable = W0613
 
-fundamental_repo                                                            = os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL")
+fundamental_repo                            = os.getenv("DEVELOPMENT_ENVIRONMENT_FUNDAMENTAL")
 assert os.path.isdir(fundamental_repo), fundamental_repo
 
 sys.path.insert(0, fundamental_repo)
@@ -109,7 +109,14 @@ def GetDependencies():
     for architecture in architectures:
         d[architecture] = Configuration(
             architecture,
-            [Dependency("0EAA1DCF22804F90AD9F5A3B85A5D706", "Common_Environment", "python36", "https://github.com/davidbrownell/Common_Environment_v3.git")],
+            [
+                Dependency(
+                    "0EAA1DCF22804F90AD9F5A3B85A5D706",
+                    "Common_Environment",
+                    "python36",
+                    "https://github.com/davidbrownell/Common_Environment_v3.git",
+                )
+            ],
         )
 
     return d
@@ -134,7 +141,13 @@ def GetCustomActions(debug, verbose, explicit_configurations):
                 if CurrentShell.CategoryName != operating_system:
                     continue
 
-                tool_dir = os.path.join(_script_dir, "Tools", tool, version, operating_system)
+                tool_dir = os.path.join(
+                    _script_dir,
+                    "Tools",
+                    tool,
+                    version,
+                    operating_system,
+                )
                 assert os.path.isdir(tool_dir), tool_dir
 
                 actions += [
@@ -157,23 +170,11 @@ def GetCustomActions(debug, verbose, explicit_configurations):
                     ),
                 ]
 
-    # Rather than creating new Install.7z files for cmake, add extra modules here
-    source_dir = os.path.join(_script_dir, "Tools", "cmake", "v3.13.4", "customizations")
-    assert os.path.isdir(source_dir), source_dir
-
-    dest_dir = os.path.join(
-        _script_dir,
-        "Tools",
-        "cmake",
-        "v3.13.4",
-        CurrentShell.CategoryName,
-        os.getenv("DEVELOPMENT_ENVIRONMENT_ENVIRONMENT_NAME"),
-        "share",
-        "cmake-3.13",
-        "Modules",
+    # Perform actions that must be completed after all other actions have completed
+    actions.append(
+        CurrentShell.Commands.Execute(
+            'python "{}"'.format(os.path.join(_script_dir, "Setup_epilogue.py")),
+        ),
     )
-
-    for filename in CommonEnvironmentImports.FileSystem.WalkFiles(source_dir):
-        shutil.copyfile(filename, os.path.join(dest_dir, os.path.basename(filename)))
 
     return actions
