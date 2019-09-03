@@ -57,7 +57,7 @@ option(
 
 option(
     CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION
-    "Do not generate code with Address Space Layout Randomization (ASLR). This should not be enabled unless it is possible to compile dependencies with ASLR."
+    "Do not generate code with Address Space Layout Randomization (ASLR). This should not be enabled unless it is not possible to compile dependencies with ASLR."
     "OFF"
 )
 
