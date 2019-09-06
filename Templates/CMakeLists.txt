@@ -19,6 +19,7 @@ project(${_project_name} VERSION ${_${_project_name}_version} LANGUAGES CXX)
 
 set(_includes "$ENV{INCLUDE}")
 set(_libs "$ENV{LIB}")
+set(CMAKE_MODULE_PATH "$ENV{DEVELOPMENT_ENVIRONMENT_CMAKE_MODULE_PATH}")
 
 if(NOT WIN32)
     string(REPLACE ":" ";" CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}")
@@ -26,7 +27,6 @@ if(NOT WIN32)
     string(REPLACE ":" ";" _libs "${_libs}")
 endif()
 
-set(CMAKE_MODULE_PATH "$ENV{DEVELOPMENT_ENVIRONMENT_CMAKE_MODULE_PATH}")
 include(CppCommon)
 
 set(CMAKE_CXX_STANDARD 17)
