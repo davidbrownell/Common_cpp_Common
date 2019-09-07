@@ -46,14 +46,16 @@ DOXYGEN_EXTENSION_IGNORE                    = "{}-ignore".format(DOXYGEN_EXTENSI
 # ----------------------------------------------------------------------
 @CommandLine.EntryPoint
 @CommandLine.Constraints(
-    code_dir=CommandLine.DirectoryTypeInfo(),
+    code_dir_or_doxygen_filename=CommandLine.FilenameTypeInfo(
+        match_any=True,
+    ),
     output_dir=CommandLine.DirectoryTypeInfo(
         ensure_exists=False,
     ),
     output_stream=None,
 )
 def EntryPoint(
-    code_dir,
+    code_dir_or_doxygen_filename,
     output_dir,
     output_stream=sys.stdout,
     verbose=False,
@@ -66,23 +68,35 @@ def EntryPoint(
         # Get the doxygen files
         doxygen_files = []
 
-        dm.stream.write("Searching for doxygen files in '{}'...".format(code_dir))
-        with dm.stream.DoneManager(
-            done_suffix=lambda: "{} found".format(inflect.no("file", len(doxygen_files))),
-            suffix="\n",
-        ) as this_dm:
-            for fullpath in FileSystem.WalkFiles(
-                code_dir,
-                include_file_extensions=[DOXYGEN_EXTENSION],
-                traverse_exclude_dir_names=FileSystem.CODE_EXCLUDE_DIR_NAMES,
-            ):
-                if not os.path.isfile(
-                    "{}{}".format(os.path.splitext(fullpath)[0], DOXYGEN_EXTENSION_IGNORE),
+        if os.path.isfile(code_dir_or_doxygen_filename):
+            doxygen_files.append(code_dir_or_doxygen_filename)
+        else:
+            dm.stream.write(
+                "Searching for doxygen files in '{}'...".format(
+                    code_dir_or_doxygen_filename,
+                ),
+            )
+            with dm.stream.DoneManager(
+                done_suffix=lambda: "{} found".format(
+                    inflect.no("file", len(doxygen_files)),
+                ),
+                suffix="\n",
+            ) as this_dm:
+                for fullpath in FileSystem.WalkFiles(
+                    code_dir_or_doxygen_filename,
+                    include_file_extensions=[DOXYGEN_EXTENSION],
+                    traverse_exclude_dir_names=FileSystem.CODE_EXCLUDE_DIR_NAMES,
                 ):
-                    doxygen_files.append(fullpath)
+                    if not os.path.isfile(
+                        "{}{}".format(
+                            os.path.splitext(fullpath)[0],
+                            DOXYGEN_EXTENSION_IGNORE,
+                        ),
+                    ):
+                        doxygen_files.append(fullpath)
 
-        if not doxygen_files:
-            return dm.result
+            if not doxygen_files:
+                return dm.result
 
         # Process the files
 
