@@ -62,6 +62,24 @@ _CUSTOM_DATA                                = [
         ],
     ),
     (
+        "graphviz",
+        [
+            (
+                "v2.38.0",
+                [
+                    (
+                        "Windows",
+                        "67d580491dc75a620c79bef1a05ee80d409b29e319918545e88a0bbe7be84213",
+                    ),
+                    (
+                        "Linux",
+                        "251513344d099faab1b10064ece906fbc763a33a74f16aef696e45699f14ace1",
+                    ),
+                ],
+            ),
+        ],
+    ),
+    (
         "ninja",
         [
             (

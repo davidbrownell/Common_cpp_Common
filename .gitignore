@@ -22,6 +22,9 @@ Tools/cmake/v3.13.4/Windows/*
 Tools/Doxygen/v1.8.16/Linux/*
 Tools/Doxygen/v1.8.16/Windows/*
 
+Tools/graphviz/v2.38.0/Linux/*
+Tools/graphviz/v2.38.0/Windows/*
+
 Tools/ninja/v1.9.0/Linux/*
 Tools/ninja/v1.9.0/Windows/*
 
