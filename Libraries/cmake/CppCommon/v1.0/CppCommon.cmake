@@ -361,7 +361,6 @@ set(CMAKE_C_FLAGS_RELEASENOOPT "${CMAKE_CXX_FLAGS_RELEASENOOPT}")
 # ----------------------------------------------------------------------
 # |  Linker Flags
 
-# No linker settings for static libs
 set(CMAKE_STATIC_LINKER_FLAGS "")
 set(CMAKE_STATIC_LINKER_FLAGS_DEBUG "")
 set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "")
