@@ -181,6 +181,10 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
     include(${CMAKE_CURRENT_LIST_DIR}/Compilers/Clang_compiler.cmake)
     include(${CMAKE_CURRENT_LIST_DIR}/Compilers/Clang_linker.cmake)
 
+elseif(CMAKE_CXX_COMPILER_ID MATCHES GNU)
+    include(${CMAKE_CURRENT_LIST_DIR}/Compilers/GCC_compiler.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/Compilers/GCC_linker.cmake)
+
 else()
     message(FATAL_ERROR "The compiler '${CMAKE_CXX_COMPILER_ID}' is not supported.")
 
