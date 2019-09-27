@@ -161,8 +161,16 @@ def GetCustomActions(
         assert False, configuration
 
     actions += [
-        CurrentShell.Commands.Set("CXXFLAGS", compiler_flags),
-        CurrentShell.Commands.Set("CFLAGS", compiler_flags),
+        CurrentShell.Commands.Augment(
+            "CXXFLAGS",
+            compiler_flags,
+            is_space_delimited_string=True,
+        ),
+        CurrentShell.Commands.Augment(
+            "CFLAGS",
+            compiler_flags,
+            is_space_delimited_string=True,
+        ),
     ]
 
     # Add scripts that augment existing functionality
