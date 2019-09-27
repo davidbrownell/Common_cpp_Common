@@ -201,7 +201,6 @@ def GetCustomActions(
         CurrentShell.Commands.Augment(
             "DEVELOPMENT_ENVIRONMENT_TESTER_CONFIGURATIONS",
             ["c++-compiler-CMake", "c++-test_parser-CMake"],
-            update_memory=True,
         ),
     )
 
