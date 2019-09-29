@@ -152,27 +152,6 @@ def GetCustomActions(
         ),
     )
 
-    # Update default flags to build for the architecture
-    if configuration == "x64":
-        compiler_flags = "-m64"
-    elif configuration == "x86":
-        compiler_flags = "-m32"
-    else:
-        assert False, configuration
-
-    actions += [
-        CurrentShell.Commands.Augment(
-            "CXXFLAGS",
-            compiler_flags,
-            is_space_delimited_string=True,
-        ),
-        CurrentShell.Commands.Augment(
-            "CFLAGS",
-            compiler_flags,
-            is_space_delimited_string=True,
-        ),
-    ]
-
     # Add scripts that augment existing functionality
     actions += DynamicPluginArchitecture.CreateRegistrationStatements(
         "DEVELOPMENT_ENVIRONMENT_COMPILERS",
