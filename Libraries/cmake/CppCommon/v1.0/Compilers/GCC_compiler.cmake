@@ -38,7 +38,7 @@ foreach(_flag IN ITEMS
     -Wno-unused-template
     -pipe                               # Avoid temporary files
 )
-    string(APPEND _local_CXX_flags " ${_flag}")
+    string(APPEND _CXX_FLAGS " ${_flag}")
 endforeach()
 
 # Debug
@@ -47,7 +47,7 @@ foreach(_flag IN ITEMS
     -D_DEBUG
     -O0                                 # No optimizations
 )
-    string(APPEND _local_CXX_flags_DEBUG " ${_flag}")
+    string(APPEND _CXX_FLAGS_DEBUG " ${_flag}")
 endforeach()
 
 # Release args
@@ -62,7 +62,7 @@ foreach(_flag IN ITEMS
     -Wl,-z,now                          # Disable lazy binding
     -Wl,-z,relro                        # Read-only segments after relocation
 )
-    string(APPEND _local_CXX_flags_RELEASE " ${_flag}")
+    string(APPEND _CXX_FLAGS_RELEASE " ${_flag}")
 endforeach()
 
 # ReleaseMinSize
@@ -77,7 +77,7 @@ foreach(_flag IN ITEMS
     -Wl,-z,now                          # Disable lazy binding
     -Wl,-z,relro                        # Read-only segments after relocation
 )
-    string(APPEND _local_CXX_flags_RELEASEMINSIZE " ${_flag}")
+    string(APPEND _CXX_FLAGS_RELEASEMINSIZE " ${_flag}")
 endforeach()
 
 # ReleaseNoOpt
@@ -92,13 +92,13 @@ foreach(_flag IN ITEMS
     -Wl,-z,now                          # Disable lazy binding
     -Wl,-z,relro                        # Read-only segments after relocation
 )
-    string(APPEND _local_CXX_flags_RELEASENOOPT " ${_flag}")
+    string(APPEND _CXX_FLAGS_RELEASENOOPT " ${_flag}")
 endforeach()
 
 if("$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x64")
-    string(APPEND _local_CXX_flags " -m64")
+    string(APPEND _CXX_FLAGS " -m64")
 elseif("$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x86")
-    string(APPEND _local_CXX_flags " -m32")
+    string(APPEND _CXX_FLAGS " -m32")
 else()
     message(FATAL_ERROR "'$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}' is not recognized")
 endif()
@@ -107,30 +107,30 @@ endif()
 # |  Dynamic Flags
 
 # CppCommon_UNICODE
-set(_local_CXX_flags_CppCommon_UNICODE_TRUE "-DUNICODE -D_UNICODE")
-set(_local_CXX_flags_CppCommon_UNICODE_FALSE "-DMBCS -D_MBCS")
+set(_CXX_FLAGS_CppCommon_UNICODE_TRUE "-DUNICODE -D_UNICODE")
+set(_CXX_FLAGS_CppCommon_UNICODE_FALSE "-DMBCS -D_MBCS")
 
 # CppCommon_STATIC_CRT
-set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE "-static-libstdc++")
+set(_CXX_FLAGS_CppCommon_STATIC_CRT_TRUE "-static-libstdc++")
 
 # CppCommon_NO_DEBUG_INFO
 foreach(_flag IN ITEMS
     -g                                  # Generate debugging information
     -grecord-gcc-switches               # Store compiler flags in debugging information
 )
-    string(APPEND _local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE " ${_flag}")
+    string(APPEND _CXX_FLAGS_CppCommon_NO_DEBUG_INFO_FALSE " ${_flag}")
 endforeach()
 
 # CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION
-set(_local_CXX_flags_CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION_FALSE "-fPIC")
-set(_local_EXE_LINKER_flags_CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION_FALSE "-pie")
+set(_CXX_FLAGS_CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION_FALSE "-fPIC")
+set(_EXE_LINKER_FLAGS_CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION_FALSE "-pie")
 
 # CppCommon_PREPROCESSOR_OUTPUT
-set(_local_CXX_flags_CppCommon_PREPROCESSOR_OUTPUT_TRUE "-E")
+set(_CXX_FLAGS_CppCommon_PREPROCESSOR_OUTPUT_TRUE "-E")
 
 # CppCommon_CODE_COVERAGE
 foreach(_flag IN ITEMS
     --coverage
 )
-    string(APPEND _local_CXX_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
+    string(APPEND _CXX_FLAGS_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
 endforeach()
