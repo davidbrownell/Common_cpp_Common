@@ -23,7 +23,7 @@ foreach(_flag IN ITEMS
     /MANIFESTUAC:"level='asInvoker' uiAccess='false'"   # Specifies whether User Account Control (UAC) information is embedded in the program manifest.
     /TLBID:1                            # Specifies the resource ID of the linker-generated type library.
 )
-    string(APPEND _local_EXE_LINKER_flags " ${_flag}")
+    string(APPEND _EXE_LINKER_FLAGS " ${_flag}")
 endforeach()
 
 # The following flags are valid for MSVC but not for Clang
@@ -31,7 +31,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     foreach(_flag IN ITEMS
         /LTCG                           # Link-time code generation
     )
-        string(APPEND _local_EXE_LINKER_flags_release " ${_flag}")
+        string(APPEND _EXE_LINKER_FLAGS_RELEASE " ${_flag}")
     endforeach()
 endif()
 
@@ -40,11 +40,11 @@ foreach(_flag IN ITEMS
     /OPT:ICF                            # Enable COMDAT Folding
     /OPT:REF                            # References
 )
-    string(APPEND _local_EXE_LINKER_flags_release " ${_flag}")
+    string(APPEND _EXE_LINKER_FLAGS_RELEASE " ${_flag}")
 endforeach()
 
-set(_local_EXE_LINKER_flags_release_min_size "${_local_EXE_LINKER_flags_release}")
-set(_local_EXE_LINKER_flags_release_no_opt "${_local_EXE_LINKER_flags_release}")
+set(_EXE_LINKER_FLAGS_RELEASEMINSIZE "${_EXE_LINKER_FLAGS_RELEASE}")
+set(_EXE_LINKER_FLAGS_RELEASENOOPT "${_EXE_LINKER_FLAGS_RELEASE}")
 
 # ----------------------------------------------------------------------
 # |  Dynamic Flags
@@ -55,11 +55,11 @@ foreach(_flag IN ITEMS
     /OPT:NOREF
     /OPT:NOICF
 )
-    string(APPEND _local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
+    string(APPEND _EXE_LINKER_FLAGS_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
 endforeach()
 
-set(_local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_FALSE_DEBUG "/INCREMENTAL")
-set(_local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_FALSE_RELEASE "/INCREMENTAL:NO")
+set(_EXE_LINKER_FLAGS_CppCommon_CODE_COVERAGE_FALSE_DEBUG "/INCREMENTAL")
+set(_EXE_LINKER_FLAGS_CppCommon_CODE_COVERAGE_FALSE_RELEASE "/INCREMENTAL:NO")
 
 # CppCommon_NO_DEBUG_INFO
-set(_local_EXE_LINKER_flags_CppCommon_NO_DEBUG_INFO_FALSE "/DEBUG")
+set(_EXE_LINKER_FLAGS_CppCommon_NO_DEBUG_INFO_FALSE "/DEBUG")

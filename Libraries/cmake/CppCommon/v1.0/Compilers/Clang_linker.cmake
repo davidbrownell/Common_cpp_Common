@@ -19,7 +19,7 @@
 foreach(_flag IN ITEMS
     # No flags at this time
 )
-    string(APPEND _local_EXE_LINKER_flags_RELEASE " ${_flag}")
-    string(APPEND _local_EXE_LINKER_flags_RELEASEMINSIZE " ${_flag}")
-    string(APPEND _local_EXE_LINKER_flags_RELEASENOOPT " ${_flag}")
+    string(APPEND _EXE_LINKER_FLAGS_RELEASE " ${_flag}")
+    string(APPEND _EXE_LINKER_FLAGS_RELEASEMINSIZE " ${_flag}")
+    string(APPEND _EXE_LINKER_FLAGS_RELEASENOOPT " ${_flag}")
 endforeach()
