@@ -25,12 +25,12 @@ if(WIN32)
     foreach(_flag IN ITEMS
         clang_rt.profile-x86_64.lib
     )
-        string(APPEND _local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
+        string(APPEND _EXE_LINKER_FLAGS_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
     endforeach()
 else()
     foreach(_flag IN ITEMS
         clang_rt.profile-x86_64
     )
-        string(APPEND _local_EXE_LINKER_flags_CppCommon_CODE_COVERAGE_TRUE " -l${_flag}")
+        string(APPEND _EXE_LINKER_FLAGS_CppCommon_CODE_COVERAGE_TRUE " -l${_flag}")
     endforeach()
 endif()
