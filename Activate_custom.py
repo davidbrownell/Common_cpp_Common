@@ -56,7 +56,7 @@ def GetCustomActions(
     """
     Returns an action or list of actions that should be invoked as part of the activation process.
 
-    Actions are generic command line statements defined in 
+    Actions are generic command line statements defined in
     <Common_Environment>/Libraries/Python/CommonEnvironment/v1.0/CommonEnvironment/Shell/Commands/__init__.py
     that are converted into statements appropriate for the current scripting language (in most
     cases, this is Bash on Linux systems and Batch or PowerShell on Windows systems.
@@ -67,7 +67,9 @@ def GetCustomActions(
     if fast:
         actions.append(
             CurrentShell.Commands.Message(
-                "** FAST: Activating without verifying content. ({})".format(_script_fullpath),
+                "** FAST: Activating without verifying content. ({})".format(
+                    _script_fullpath,
+                ),
             ),
         )
     else:
@@ -77,7 +79,13 @@ def GetCustomActions(
                     if CurrentShell.CategoryName != operating_system:
                         continue
 
-                    tool_dir = os.path.join(_script_dir, "Tools", tool, version, operating_system)
+                    tool_dir = os.path.join(
+                        _script_dir,
+                        "Tools",
+                        tool,
+                        version,
+                        operating_system,
+                    )
                     assert os.path.isdir(tool_dir), tool_dir
 
                     actions.append(
@@ -107,7 +115,10 @@ def GetCustomActions(
             cmake_dirs.append(directory.replace("\\", "/"))
 
     actions.append(
-        CurrentShell.Commands.Augment("DEVELOPMENT_ENVIRONMENT_CMAKE_MODULE_PATH", cmake_dirs),
+        CurrentShell.Commands.Augment(
+            "DEVELOPMENT_ENVIRONMENT_CMAKE_MODULE_PATH",
+            cmake_dirs,
+        ),
     )
 
     # Load all libraries
@@ -124,6 +135,14 @@ def GetCustomActions(
                 includes.append(directory)
 
     actions.append(CurrentShell.Commands.Augment("INCLUDE", includes))
+
+    # Add a compiler name (that will likely be overridden by a repo that depends on this one)
+    actions.append(
+        CurrentShell.Commands.Set(
+            "DEVELOPMENT_ENVIRONMENT_CPP_COMPILER_NAME",
+            "SystemCompiler",
+        ),
+    )
 
     # Add the architecture
     actions.append(
@@ -142,38 +161,46 @@ def GetCustomActions(
         assert False, configuration
 
     actions += [
-        CurrentShell.Commands.Set("CXXFLAGS", compiler_flags),
-        CurrentShell.Commands.Set("CFLAGS", compiler_flags),
+        CurrentShell.Commands.Augment(
+            "CXXFLAGS",
+            compiler_flags,
+            is_space_delimited_string=True,
+        ),
+        CurrentShell.Commands.Augment(
+            "CFLAGS",
+            compiler_flags,
+            is_space_delimited_string=True,
+        ),
     ]
 
     # Add scripts that augment existing functionality
     actions += DynamicPluginArchitecture.CreateRegistrationStatements(
         "DEVELOPMENT_ENVIRONMENT_COMPILERS",
         os.path.join(_script_dir, "Scripts", "Compilers"),
-        lambda fullpath, name, ext: ext == ".py" and (name.endswith("Compiler") or name.endswith("CodeGenerator") or name.endswith("Verifier")),
+        lambda fullpath, name, ext: ext == ".py"
+        and (
+            name.endswith("Compiler")
+            or name.endswith("CodeGenerator")
+            or name.endswith("Verifier")
+        ),
     )
 
     actions += DynamicPluginArchitecture.CreateRegistrationStatements(
         "DEVELOPMENT_ENVIRONMENT_TEST_PARSERS",
         os.path.join(_script_dir, "Scripts", "TestParsers"),
-        lambda fullpath,
-        name,
-        ext: ext == ".py" and name.endswith("TestParser"),
+        lambda fullpath, name, ext: ext == ".py" and name.endswith("TestParser"),
     )
 
     actions += DynamicPluginArchitecture.CreateRegistrationStatements(
         "DEVELOPMENT_ENVIRONMENT_FORMATTERS",
         os.path.join(_script_dir, "Scripts", "Formatters"),
-        lambda fullpath,
-        name,
-        ext: ext == ".py" and name.endswith("Formatter"),
+        lambda fullpath, name, ext: ext == ".py" and name.endswith("Formatter"),
     )
 
     actions.append(
         CurrentShell.Commands.Augment(
             "DEVELOPMENT_ENVIRONMENT_TESTER_CONFIGURATIONS",
             ["c++-compiler-CMake", "c++-test_parser-CMake"],
-            update_memory=True,
         ),
     )
 
@@ -188,7 +215,7 @@ def GetCustomScriptExtractors():
     that depend upon it.
 
     ****************************************************
-    Note that it is very rare to have the need to implement 
+    Note that it is very rare to have the need to implement
     this method. In most cases, it is safe to delete it.
     ****************************************************
 
@@ -197,7 +224,7 @@ def GetCustomScriptExtractors():
         - DirGenerator:             Method to enumerate sub-directories when searching for scripts in a
                                     repository's Scripts directory.
 
-                                        def Func(directory, version_sepcs) -> [ (subdir, should_recurse), ... ] 
+                                        def Func(directory, version_sepcs) -> [ (subdir, should_recurse), ... ]
                                                                               [ subdir, ... ]
                                                                               (subdir, should_recurse)
                                                                               subdir
@@ -207,7 +234,7 @@ def GetCustomScriptExtractors():
                                         def Func(script_filename) -> [ command, ...]
                                                                      command
                                                                      None           # Indicates not supported
-        
+
         - CreateDocumentation:      Method that extracts documentation from a script.
 
                                         def Func(script_filename) -> documentation string
@@ -227,7 +254,11 @@ def GetCustomScriptExtractors():
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 def _EnumLibraryDependencies(type, root, version_info):
-    library_fullpath = os.path.join(root, RepositoryBootstrapConstants.LIBRARIES_SUBDIR, type)
+    library_fullpath = os.path.join(
+        root,
+        RepositoryBootstrapConstants.LIBRARIES_SUBDIR,
+        type,
+    )
     if not os.path.isdir(library_fullpath):
         return
 

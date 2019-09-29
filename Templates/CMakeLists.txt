@@ -15,7 +15,11 @@ set(_${_project_name}_version_minor <project_version_minor>)
 set(_${_project_name}_version_patch <project_version_patch>)
 set(_${_project_name}_version ${_${_project_name}_version_major}.${_${_project_name}_version_minor}.${_${_project_name}_version_patch})
 
-project(${_project_name} VERSION ${_${_project_name}_version} LANGUAGES CXX)
+# Alpha version components (which are supported in SemVer) present problems
+# for cmake when the version is provided inline. However, things work as expected
+# when setting the version as a property.
+project(${_project_name} LANGUAGES CXX)
+set(PROJECT_VERSION ${_${_project_name}_version})
 
 set(_includes "$ENV{INCLUDE}")
 set(_libs "$ENV{LIB}")
@@ -33,7 +37,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# All paths should be relative to `${_this_path}`
+# All paths should be relative to `${_this_path}`. Note that this value should
+# be recalculated after including other cmake modules, as those may redefine
+# its value.
+#
+# NOTE: I wish I knew of a way to limit a variable's scope so that include files
+#       wouldn't override this specific value; I am looking for a "file-scope"
+#       setting.
 get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 
 add_executable(

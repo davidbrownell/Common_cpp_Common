@@ -34,13 +34,13 @@ foreach(_flag IN ITEMS
     -Wno-unused-command-line-argument
     -Wno-unused-template
 )
-    string(APPEND _local_CXX_flags " ${_flag}")
+    string(APPEND _CXX_FLAGS " ${_flag}")
 endforeach()
 
 if("$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x64")
-    string(APPEND _local_CXX_flags " -m64")
+    string(APPEND _CXX_FLAGS " -m64")
 elseif("$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x86")
-    string(APPEND _local_CXX_flags " -m32")
+    string(APPEND _CXX_FLAGS " -m32")
 else()
     message(FATAL_ERROR "'$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}' is not recognized")
 endif()
@@ -52,5 +52,5 @@ endif()
 foreach(_flag IN ITEMS
     --coverage
 )
-    string(APPEND _local_CXX_flags_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
+    string(APPEND _CXX_FLAGS_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
 endforeach()

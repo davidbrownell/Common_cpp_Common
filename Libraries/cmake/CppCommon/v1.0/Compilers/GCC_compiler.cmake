@@ -1,9 +1,9 @@
 # ----------------------------------------------------------------------
 # |
-# |  Clang_compiler.cmake
+# |  GCC_compiler.cmake
 # |
 # |  David Brownell <db@DavidBrownell.com>
-# |      2019-07-28 09:11:21
+# |      2019-09-26 16:30:48
 # |
 # ----------------------------------------------------------------------
 # |
@@ -14,12 +14,28 @@
 # |
 # ----------------------------------------------------------------------
 
+# Contains linker settings common to scenarios when clang is used directly or
+# as a proxy for other backend compilers (MSVC or GCC).
+
 # ----------------------------------------------------------------------
 # |  Static Flags
 foreach(_flag IN ITEMS
     -fasynchronous-unwind-tables        # Increased reliability of backtraces
     -fexceptions                        # Enable table-based thread cancellation
+    -fmacro-backtrace-limit=0
     -fvisibility=hidden                 # Symbols in shared libraries are hidden by default (which is consistent with Windows)
+    -W
+    -Wall
+    -Wno-c++98-compat-pedantic
+    -Wno-disabled-macro-expansion
+    -Wno-extra-semi
+    -Wno-global-constructors
+    -Wno-gnu-zero-variadic-macro-arguments
+    -Wno-invalid-token-paste
+    -Wno-missing-prototypes
+    -Wno-reserved-id-macro
+    -Wno-unused-command-line-argument
+    -Wno-unused-template
     -pipe                               # Avoid temporary files
 )
     string(APPEND _CXX_FLAGS " ${_flag}")
@@ -79,6 +95,14 @@ foreach(_flag IN ITEMS
     string(APPEND _CXX_FLAGS_RELEASENOOPT " ${_flag}")
 endforeach()
 
+if("$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x64")
+    string(APPEND _CXX_FLAGS " -m64")
+elseif("$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x86")
+    string(APPEND _CXX_FLAGS " -m32")
+else()
+    message(FATAL_ERROR "'$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}' is not recognized")
+endif()
+
 # ----------------------------------------------------------------------
 # |  Dynamic Flags
 
@@ -103,3 +127,10 @@ set(_EXE_LINKER_FLAGS_CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION_FALSE "-pi
 
 # CppCommon_PREPROCESSOR_OUTPUT
 set(_CXX_FLAGS_CppCommon_PREPROCESSOR_OUTPUT_TRUE "-E")
+
+# CppCommon_CODE_COVERAGE
+foreach(_flag IN ITEMS
+    --coverage
+)
+    string(APPEND _CXX_FLAGS_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
+endforeach()

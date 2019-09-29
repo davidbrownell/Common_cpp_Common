@@ -42,7 +42,7 @@ foreach(_flag IN ITEMS
     /Zc:forScope                        # enforce Standard C++ for scoping rules
     /Zc:wchar_t                         # wchar_t is the native type, not a typedef
 )
-    string(APPEND _local_CXX_flags " ${_flag}")
+    string(APPEND _CXX_FLAGS " ${_flag}")
 endforeach()
 
 # Debug
@@ -53,7 +53,7 @@ foreach(_flag IN ITEMS
     /Od                                 # disable optimizations
     /RTC1                               # Enable fast checks
 )
-    string(APPEND _local_CXX_flags_DEBUG " ${_flag}")
+    string(APPEND _CXX_FLAGS_DEBUG " ${_flag}")
 endforeach()
 
 # Release
@@ -68,7 +68,7 @@ foreach(_flag IN ITEMS
     /Ot                                 # favor code speed
     /Ox                                 # optimizations (favor speed)
 )
-    string(APPEND _local_CXX_flags_RELEASE " ${_flag}")
+    string(APPEND _CXX_FLAGS_RELEASE " ${_flag}")
 endforeach()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
@@ -76,7 +76,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
         "-Xclang -O3"                   # Advanced optimizations
         "-Xclang -fno-inline"           # Inline optimizations present problems with -O3
     )
-        string(APPEND _local_CXX_flags_RELEASE " ${_flag}")
+        string(APPEND _CXX_FLAGS_RELEASE " ${_flag}")
     endforeach()
 endif()
 
@@ -88,7 +88,7 @@ foreach(_flag IN ITEMS
     /Ob1                                # inline expansion (default n=0)
     /Os                                 # favor code space
 )
-    string(APPEND _local_CXX_flags_RELEASEMINSIZE " ${_flag}")
+    string(APPEND _CXX_FLAGS_RELEASEMINSIZE " ${_flag}")
 endforeach()
 
 # ReleaseNoOpt
@@ -98,39 +98,39 @@ foreach(_flag IN ITEMS
     /Ob0                                # inline expansion (default n=0)
     /Od                                 # disable optimizations
 )
-    string(APPEND _local_CXX_flags_RELEASENOOPT " ${_flag}")
+    string(APPEND _CXX_FLAGS_RELEASENOOPT " ${_flag}")
 endforeach()
 
 # ----------------------------------------------------------------------
 # |  Dynamic Flags
 
 # CppCommon_UNICODE
-set(_local_CXX_flags_CppCommon_UNICODE_TRUE "/DUNICODE /D_UNICODE")
-set(_local_CXX_flags_CppCommon_UNICODE_FALSE "/DMBCS /D_MBCS")
+set(_CXX_FLAGS_CppCommon_UNICODE_TRUE "/DUNICODE /D_UNICODE")
+set(_CXX_FLAGS_CppCommon_UNICODE_FALSE "/DMBCS /D_MBCS")
 
 # CppCommon_STATIC_CRT
-set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_DEBUG "/MTd")
-set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASE "/MT")
-set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASEMINSIZE "${_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASE}")
-set(_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASENOOPT "${_local_CXX_flags_CppCommon_STATIC_CRT_TRUE_RELEASE}")
+set(_CXX_FLAGS_CppCommon_STATIC_CRT_TRUE_DEBUG "/MTd")
+set(_CXX_FLAGS_CppCommon_STATIC_CRT_TRUE_RELEASE "/MT")
+set(_CXX_FLAGS_CppCommon_STATIC_CRT_TRUE_RELEASEMINSIZE "${_CXX_FLAGS_CppCommon_STATIC_CRT_TRUE_RELEASE}")
+set(_CXX_FLAGS_CppCommon_STATIC_CRT_TRUE_RELEASENOOPT "${_CXX_FLAGS_CppCommon_STATIC_CRT_TRUE_RELEASE}")
 
-set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_DEBUG "/MDd")
-set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASE "/MD")
-set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASEMINSIZE "${_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASE}")
-set(_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASENOOPT "${_local_CXX_flags_CppCommon_STATIC_CRT_FALSE_RELEASE}")
+set(_CXX_FLAGS_CppCommon_STATIC_CRT_FALSE_DEBUG "/MDd")
+set(_CXX_FLAGS_CppCommon_STATIC_CRT_FALSE_RELEASE "/MD")
+set(_CXX_FLAGS_CppCommon_STATIC_CRT_FALSE_RELEASEMINSIZE "${_CXX_FLAGS_CppCommon_STATIC_CRT_FALSE_RELEASE}")
+set(_CXX_FLAGS_CppCommon_STATIC_CRT_FALSE_RELEASENOOPT "${_CXX_FLAGS_CppCommon_STATIC_CRT_FALSE_RELEASE}")
 
 # CppCommon_CODE_COVERAGE
 foreach(_flag IN ITEMS
     /Zc:inline                          # remove unreferenced function or data if it is COMDAT or has internal linkage only
 )
-    string(APPEND _local_CXX_flags_CppCommon_CODE_COVERAGE_FALSE " ${_flag}")
+    string(APPEND _CXX_FLAGS_CppCommon_CODE_COVERAGE_FALSE " ${_flag}")
 endforeach()
 
 # CppCommon_NO_DEBUG_INFO
-set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_DEBUG "/ZI")
-set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASE "/Zi")
-set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASEMINSIZE "${_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASE}")
-set(_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASENOOPT "${_local_CXX_flags_CppCommon_NO_DEBUG_INFO_FALSE_RELEASE}")
+set(_CXX_FLAGS_CppCommon_NO_DEBUG_INFO_FALSE_DEBUG "/ZI")
+set(_CXX_FLAGS_CppCommon_NO_DEBUG_INFO_FALSE_RELEASE "/Zi")
+set(_CXX_FLAGS_CppCommon_NO_DEBUG_INFO_FALSE_RELEASEMINSIZE "${_CXX_FLAGS_CppCommon_NO_DEBUG_INFO_FALSE_RELEASE}")
+set(_CXX_FLAGS_CppCommon_NO_DEBUG_INFO_FALSE_RELEASENOOPT "${_CXX_FLAGS_CppCommon_NO_DEBUG_INFO_FALSE_RELEASE}")
 
 # CppCommon_PREPROCESSOR_OUTPUT
-set(_local_CXX_flags_CppCommon_PREPROCESSOR_OUTPUT_TRUE "/P")
+set(_CXX_FLAGS_CppCommon_PREPROCESSOR_OUTPUT_TRUE "/P")
