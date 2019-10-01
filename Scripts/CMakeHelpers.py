@@ -37,6 +37,9 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 
 @CommandLine.EntryPoint
 @CommandLine.Constraints(
+    generator=CommandLine.StringTypeInfo(
+        arity="?",
+    ),
     working_dir=CommandLine.DirectoryTypeInfo(
         arity="?",
     ),
