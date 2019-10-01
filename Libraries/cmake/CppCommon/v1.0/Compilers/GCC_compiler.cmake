@@ -14,28 +14,16 @@
 # |
 # ----------------------------------------------------------------------
 
-# Contains linker settings common to scenarios when clang is used directly or
-# as a proxy for other backend compilers (MSVC or GCC).
-
 # ----------------------------------------------------------------------
 # |  Static Flags
 foreach(_flag IN ITEMS
     -fasynchronous-unwind-tables        # Increased reliability of backtraces
     -fexceptions                        # Enable table-based thread cancellation
-    -fmacro-backtrace-limit=0
-    -fvisibility=hidden                 # Symbols in shared libraries are hidden by default (which is consistent with Windows)
+    -fvisibility=hidden
     -W
     -Wall
-    -Wno-c++98-compat-pedantic
-    -Wno-disabled-macro-expansion
-    -Wno-extra-semi
-    -Wno-global-constructors
-    -Wno-gnu-zero-variadic-macro-arguments
-    -Wno-invalid-token-paste
-    -Wno-missing-prototypes
-    -Wno-reserved-id-macro
-    -Wno-unused-command-line-argument
-    -Wno-unused-template
+    -Werror
+    -Wno-unused-local-typedefs
     -pipe                               # Avoid temporary files
 )
     string(APPEND _CXX_FLAGS " ${_flag}")
