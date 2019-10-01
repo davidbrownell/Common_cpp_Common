@@ -69,8 +69,8 @@ def Generate(
             "'/build' must be provided if '/test' is provided",
         )
 
-    command_line_template = 'cmake -G {generator} -S "{working_dir}" -B "{{build_dir}}" -DCMAKE_BUILD_TYPE={{configuration}} {params} {root_dir}'.format(
-        generator=generator,
+    command_line_template = 'cmake {generator} -S "{working_dir}" -B "{{build_dir}}" -DCMAKE_BUILD_TYPE={{configuration}} {params} {root_dir}'.format(
+        generator='-G "{}"'.format(generator) if generator else "",
         working_dir=working_dir,
         params=" ".join(cmake_params),
         root_dir=os.path.join(*([".."] * 5))
