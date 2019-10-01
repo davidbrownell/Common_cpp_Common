@@ -218,9 +218,7 @@ foreach(_flag_prefix IN ITEMS
 
     if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_flag_name}_UPDATED)
         string(STRIP "${${_flag_name}}" ${_flag_name})
-
         set("${_cached_flag_name}" "${${_flag_name}}" CACHE string "" FORCE)
-        set("${_flag_name}_UPDATED" true CACHE bool "Indicates that '${_cached_flag_name}' has already been updated and should not be updated during future configuration/generation cycles." FORCE)
     endif()
 
     foreach(_configuration_type IN ITEMS
@@ -234,9 +232,7 @@ foreach(_flag_prefix IN ITEMS
 
         if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_flag_name}_UPDATED)
             string(STRIP "${${_flag_name}}" ${_flag_name})
-
             set("${_cached_flag_name}" "${${_flag_name}}" CACHE string "" FORCE)
-            set("${_flag_name}_UPDATED" true CACHE bool "Indicates that '${_cached_flag_name}' has already been updated and should not be updated during future configuration/generation cycles." FORCE)
         endif()
     endforeach()
 
