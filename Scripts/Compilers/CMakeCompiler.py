@@ -196,7 +196,7 @@ class Compiler(
                     "ON" if metadata["disable_debug_info"] else "OFF",
                 ),
                 "-DCppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION={}".format(
-                    "ON" if not metadata["disable_aslr"] else "OFF",
+                    "ON" if metadata["disable_aslr"] else "OFF",
                 ),
             ]
 
