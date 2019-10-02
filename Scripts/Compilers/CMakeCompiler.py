@@ -32,12 +32,22 @@ from CommonEnvironment.StreamDecorator import StreamDecorator
 from CommonEnvironment import StringHelpers
 
 from CommonEnvironment.CompilerImpl import Compiler as CompilerMod
-from CommonEnvironment.CompilerImpl.InputProcessingMixin.IndividualInputProcessingMixin import IndividualInputProcessingMixin
-from CommonEnvironment.CompilerImpl.InvocationMixin.CommandLineInvocationMixin import CommandLineInvocationMixin
-from CommonEnvironment.CompilerImpl.InvocationQueryMixin.ConditionalInvocationQueryMixin import ConditionalInvocationQueryMixin
-from CommonEnvironment.CompilerImpl.OutputMixin.MultipleOutputMixin import MultipleOutputMixin
+from CommonEnvironment.CompilerImpl.InputProcessingMixin.IndividualInputProcessingMixin import (
+    IndividualInputProcessingMixin,
+)
+from CommonEnvironment.CompilerImpl.InvocationMixin.CommandLineInvocationMixin import (
+    CommandLineInvocationMixin,
+)
+from CommonEnvironment.CompilerImpl.InvocationQueryMixin.ConditionalInvocationQueryMixin import (
+    ConditionalInvocationQueryMixin,
+)
+from CommonEnvironment.CompilerImpl.OutputMixin.MultipleOutputMixin import (
+    MultipleOutputMixin,
+)
 
-from CommonEnvironment.TypeInfo.FundamentalTypes.DirectoryTypeInfo import DirectoryTypeInfo
+from CommonEnvironment.TypeInfo.FundamentalTypes.DirectoryTypeInfo import (
+    DirectoryTypeInfo,
+)
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -98,7 +108,9 @@ class Compiler(
                 continue
 
             if os.path.isfile(dest_filename):
-                raise Exception("The file '{}' already exists ({})".format(dest_filename, filename))
+                raise Exception(
+                    "The file '{}' already exists ({})".format(dest_filename, filename),
+                )
 
             shutil.copyfile(filename, dest_filename)
 
@@ -125,10 +137,21 @@ class Compiler(
     @classmethod
     @Interface.override
     def _GetOptionalMetadata(cls):
-        return [("generator", "Ninja"), ("is_debug", True), ("is_profile", False), ("disable_debug_info", False), ("static_crt", True), ("use_unicode", False)] + super(
-            Compiler,
-            cls,
-        )._GetOptionalMetadata()
+        return [
+            (
+                "generator",
+                None
+                if os.getenv("DEVELOPMENT_ENVIRONMENT_CPP_USE_DEFAULT_CMAKE_GENERATOR")
+                else "Ninja",
+            ),
+            ("is_debug", True),
+            ("cmake_debug_output", False),
+            ("use_unicode", False),
+            ("static_crt", True),
+            ("is_profile", False),
+            ("disable_debug_info", False),
+            ("disable_aslr", False),
+        ] + super(Compiler, cls)._GetOptionalMetadata()
 
     # ----------------------------------------------------------------------
     @classmethod
@@ -153,18 +176,36 @@ class Compiler(
             command_line_options = [
                 '-S "{}"'.format(metadata["input"]),
                 '-B "{}"'.format(metadata["output_dir"]),
-                '-G {}'.format(metadata["generator"]),
                 '"--graphviz={}"'.format(dot_filename),
-                "-DCMAKE_BUILD_TYPE={}".format("Debug" if metadata["is_debug"] else "Release"),
-                "-DCppCommon_CODE_COVERAGE={}".format("ON" if metadata["is_profile"] else "OFF"),
+                "-DCMAKE_BUILD_TYPE={}".format(
+                    "Debug" if metadata["is_debug"] else "Release",
+                ),
+                "-DCppCommon_CMAKE_DEBUG_OUTPUT={}".format(
+                    "ON" if metadata["cmake_debug_output"] else "OFF",
+                ),
+                "-DCppCommon_UNICODE={}".format(
+                    "ON" if metadata["use_unicode"] else "OFF",
+                ),
+                "-DCppCommon_STATIC_CRT={}".format(
+                    "ON" if metadata["static_crt"] else "OFF",
+                ),
+                "-DCppCommon_CODE_COVERAGE={}".format(
+                    "ON" if metadata["is_profile"] else "OFF",
+                ),
                 "-DCppCommon_NO_DEBUG_INFO={}".format(
                     "ON" if metadata["disable_debug_info"] else "OFF",
                 ),
-                "-DCppCommon_STATIC_CRT={}".format("ON" if metadata["static_crt"] else "OFF"),
-                "-DCppCommon_UNICODE={}".format("ON" if metadata["use_unicode"] else "OFF"),
+                "-DCppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION={}".format(
+                    "ON" if metadata["disable_aslr"] else "OFF",
+                ),
             ]
 
-            result, output = Process.Execute("cmake {}".format(" ".join(command_line_options)))
+            if metadata["generator"]:
+                command_line_options.append('-G "{}"'.format(metadata["generator"]))
+
+            result, output = Process.Execute(
+                "cmake {}".format(" ".join(command_line_options)),
+            )
             if result != 0:
                 raise Exception(
                     textwrap.dedent(
@@ -176,7 +217,9 @@ class Compiler(
                 )
 
             # Parse the dot file
-            regex = re.compile(r"\"node\d+\"\s*\[\s*label=\"(?P<name>.+?)\" shape=\"house\"\s*\];")
+            regex = re.compile(
+                r"\"node\d+\"\s*\[\s*label=\"(?P<name>.+?)\" shape=\"house\"\s*\];",
+            )
 
             with open(dot_filename) as f:
                 content = f.read()

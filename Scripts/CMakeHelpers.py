@@ -34,8 +34,12 @@ _script_fullpath                            = CommonEnvironment.ThisFullpath()
 _script_dir, _script_name                   = os.path.split(_script_fullpath)
 # ----------------------------------------------------------------------
 
+
 @CommandLine.EntryPoint
 @CommandLine.Constraints(
+    generator=CommandLine.StringTypeInfo(
+        arity="?",
+    ),
     working_dir=CommandLine.DirectoryTypeInfo(
         arity="?",
     ),
@@ -46,7 +50,11 @@ _script_dir, _script_name                   = os.path.split(_script_fullpath)
 )
 def Generate(
     working_dir=os.getcwd(),
-    generator="Ninja",
+    generator=(
+        None
+        if os.getenv("DEVELOPMENT_ENVIRONMENT_CPP_USE_DEFAULT_CMAKE_GENERATOR")
+        else "Ninja"
+    ),
     cmake_param=None,
     force=False,
     build=False,
@@ -60,29 +68,29 @@ def Generate(
     del cmake_param
 
     if test and not build:
-        raise CommandLine.UsageException("'/build' must be provided if '/test' is provided")
+        raise CommandLine.UsageException(
+            "'/build' must be provided if '/test' is provided",
+        )
 
-    command_line_template = 'cmake -G {generator} -S "{working_dir}" -B "{{build_dir}}" -DCMAKE_BUILD_TYPE={{configuration}} {params} {root_dir}'.format(
-        generator=generator,
+    command_line_template = 'cmake {generator} -S "{working_dir}" -B "{{build_dir}}" -DCMAKE_BUILD_TYPE={{configuration}} {params} {root_dir}'.format(
+        generator='-G "{}"'.format(generator) if generator else "",
         working_dir=working_dir,
         params=" ".join(cmake_params),
-        root_dir=os.path.join(*([".."] * 5)),
+        root_dir=os.path.join(*([".."] * 5))
     )
 
     # ----------------------------------------------------------------------
-    def Callback(
-        test_lock,
-        configuration,
-        build_dir,
-        output_stream,
-        on_status_update,
-    ):
+    def Callback(test_lock, configuration, build_dir, output_stream, on_status_update):
         on_status_update("Generating")
         _PrintHeader("Generate Output", output_stream)
 
         if os.path.isdir(build_dir):
             if not force:
-                output_stream.write("The output dir '{}' already exists and will not be overwritten.\n".format(build_dir))
+                output_stream.write(
+                    "The output dir '{}' already exists and will not be overwritten.\n".format(
+                        build_dir,
+                    ),
+                )
                 return 1
 
             FileSystem.RemoveTree(build_dir)
@@ -137,7 +145,9 @@ def Generate(
 
                     """,
                 ).format(
-                    existing_items_list=", ".join(['"{}"'.format(existing_item) for existing_item in existing_items]),
+                    existing_items_list=", ".join(
+                        ['"{}"'.format(existing_item) for existing_item in existing_items],
+                    ),
                 ),
             )
 
@@ -164,12 +174,7 @@ def Generate(
 
     # ----------------------------------------------------------------------
 
-    return _Impl(
-        working_dir,
-        output_stream,
-        verbose,
-        Callback,
-    )
+    return _Impl(working_dir, output_stream, verbose, Callback)
 
 
 # ----------------------------------------------------------------------
@@ -189,13 +194,7 @@ def Build(
     """Executes builds for multiple configurations"""
 
     # ----------------------------------------------------------------------
-    def Callback(
-        test_lock,
-        configuration,
-        build_dir,
-        output_stream,
-        on_status_update,
-    ):
+    def Callback(test_lock, configuration, build_dir, output_stream, on_status_update):
         if not os.path.isdir(build_dir):
             output_stream.write("ERROR: '{}' is not a valid directory.".format(build_dir))
             return -1
@@ -222,12 +221,7 @@ def Build(
 
     # ----------------------------------------------------------------------
 
-    return _Impl(
-        working_dir,
-        output_stream,
-        verbose,
-        Callback,
-    )
+    return _Impl(working_dir, output_stream, verbose, Callback)
 
 
 # ----------------------------------------------------------------------
@@ -246,13 +240,7 @@ def Test(
     """Executes tests for multiple configurations"""
 
     # ----------------------------------------------------------------------
-    def Callback(
-        test_lock,
-        configuration,
-        build_dir,
-        output_stream,
-        on_status_update,
-    ):
+    def Callback(test_lock, configuration, build_dir, output_stream, on_status_update):
         if not os.path.isdir(build_dir):
             output_stream.write("ERROR: '{}' is not a valid directory.".format(build_dir))
             return -1
@@ -271,12 +259,7 @@ def Test(
 
     # ----------------------------------------------------------------------
 
-    return _Impl(
-        working_dir,
-        output_stream,
-        verbose,
-        Callback,
-    )
+    return _Impl(working_dir, output_stream, verbose, Callback)
 
 
 # ----------------------------------------------------------------------
@@ -284,7 +267,11 @@ def Test(
 # ----------------------------------------------------------------------
 def _Impl(working_dir, output_stream, verbose, callback_func):
     if not os.path.isfile(os.path.join(working_dir, "CMakeLists.txt")):
-        raise CommandLine.UsageException("The directory '{}' does not contain the file 'CMakeLists.txt'".format(working_dir))
+        raise CommandLine.UsageException(
+            "The directory '{}' does not contain the file 'CMakeLists.txt'".format(
+                working_dir,
+            ),
+        )
 
     with StreamDecorator(output_stream).DoneManager(
         line_prefix="",
@@ -307,7 +294,9 @@ def _Impl(working_dir, output_stream, verbose, callback_func):
         # ----------------------------------------------------------------------
         def Impl(task_index, output_stream, on_status_update):
             configuration = configuration_types[task_index]
-            build_dir = os.path.join(*([working_dir] + build_dir_prefix + [configuration]))
+            build_dir = os.path.join(
+                *([working_dir] + build_dir_prefix + [configuration])
+            )
 
             return callback_func(
                 test_lock,
@@ -320,7 +309,10 @@ def _Impl(working_dir, output_stream, verbose, callback_func):
         # ----------------------------------------------------------------------
 
         dm.result = TaskPool.Execute(
-            [TaskPool.Task(configuration_type, Impl) for configuration_type in configuration_types],
+            [
+                TaskPool.Task(configuration_type, Impl)
+                for configuration_type in configuration_types
+            ],
             dm.stream,
             progress_bar=True,
             verbose=verbose,
