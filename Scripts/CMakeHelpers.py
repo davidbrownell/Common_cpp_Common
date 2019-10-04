@@ -121,6 +121,7 @@ def Generate(
                     import sys
 
                     import CommonEnvironment
+                    from CommonEnvironment import CommandLine
                     from CommonEnvironment import FileSystem
                     from CommonEnvironment.StreamDecorator import StreamDecorator
 
@@ -129,20 +130,63 @@ def Generate(
                     _script_dir, _script_name                   = os.path.split(_script_fullpath)
                     # ----------------------------------------------------------------------
 
-                    existing_items = set([{existing_items_list}])
+                    @CommandLine.EntryPoint
+                    @CommandLine.Constraints(
+                        output_stream=None,
+                    )
+                    def EntryPoint(
+                        all=False,
+                        output_stream=sys.stdout,
+                    ):
+                        with StreamDecorator(output_stream).DoneManager(
+                            line_prefix="",
+                            prefix="\\nResults: ",
+                            suffix="\\n",
+                        ) as dm:
+                            existing_items = set([{existing_items_list}])
 
-                    output_stream = StreamDecorator(sys.stdout)
+                            for item in os.listdir(_script_dir):
+                                if item in existing_items or item == _script_name:
+                                    continue
 
-                    for item in os.listdir(_script_dir):
-                        if item in existing_items or item == _script_name:
-                            continue
+                                fullpath = os.path.join(_script_dir, item)
 
-                        fullpath = os.path.join(_script_dir, item)
+                                dm.stream.write("Removing '{{}}'...".format(fullpath))
+                                with dm.stream.DoneManager():
+                                    FileSystem.RemoveItem(fullpath)
 
-                        output_stream.write("Removing '{{}}'...".format(fullpath))
-                        with output_stream.DoneManager():
-                            FileSystem.RemoveItem(fullpath)
+                            cmake_dirs = os.path.join(_script_dir, "CMakeFiles")
 
+                            if all:
+                                dm.stream.write("Removing '{{}}'...".format(cmake_dirs))
+                                with dm.stream.DoneManager():
+                                    FileSystem.RemoveTree(cmake_dirs)
+
+                            else:
+                                dirs_to_delete = []
+
+                                for fullpath, _ in FileSystem.WalkDirs(
+                                    cmake_dirs,
+                                    include_dir_names=[lambda name: os.path.splitext(name)[1] == ".dir"],
+                                ):
+                                    dirs_to_delete.append(fullpath)
+
+                                for dir_to_delete in dirs_to_delete:
+                                    dm.stream.write("Removing '{{}}'...".format(dir_to_delete))
+                                    with dm.stream.DoneManager():
+                                        FileSystem.RemoveTree(dir_to_delete)
+
+                            return dm.result
+
+
+                    # ----------------------------------------------------------------------
+                    # ----------------------------------------------------------------------
+                    # ----------------------------------------------------------------------
+                    if __name__ == "__main__":
+                        try:
+                            sys.exit(CommandLine.Main())
+                        except KeyboardInterrupt:
+                            pass
                     """,
                 ).format(
                     existing_items_list=", ".join(
