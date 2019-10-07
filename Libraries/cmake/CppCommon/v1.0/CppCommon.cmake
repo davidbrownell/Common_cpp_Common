@@ -22,49 +22,49 @@ cmake_policy(SET CMP0066 NEW)               # Honor compile flags
 option(
     CppCommon_CMAKE_FORCE_FLAG_GENERATION
     "Force the repopulation of CMAKE flags, overwriting any changes made after a previous generation."
-    "OFF"
+    OFF
 )
 
 option(
     CppCommon_CMAKE_DEBUG_OUTPUT
     "Generates cmake debug output"
-    "OFF"
+    OFF
 )
 
 option(
     CppCommon_UNICODE
     "Use the unicode character set (default is multi-byte (best practice is to leverage UTF-8))."
-    "OFF"
+    OFF
 )
 
 option(
     CppCommon_STATIC_CRT
     "Statically link with the CRT."
-    "OFF"
+    OFF
 )
 
 option(
     CppCommon_CODE_COVERAGE
     "Produce builds that can be used when extracting code coverage information (requires a Debug build)."
-    "OFF"
+    OFF
 )
 
 option(
     CppCommon_NO_DEBUG_INFO
     "Do not generate debug info for the build (this is not recommended)"
-    "OFF"
+    OFF
 )
 
 option(
     CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION
     "Do not generate code with Address Space Layout Randomization (ASLR). This should not be enabled unless it is not possible to compile dependencies with ASLR."
-    "OFF"
+    OFF
 )
 
 option(
     CppCommon_PREPROCESSOR_OUTPUT
     "Generate preprocessor output"
-    "OFF"
+    OFF
 )
 
 # CMAKE_CONFIGURATION_TYPES
@@ -165,8 +165,16 @@ foreach(_flag_prefix IN ITEMS
                 RELEASENOOPT
             )
                 set("_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}_${_configuration_type}" "")
-
             endforeach()
+        endforeach()
+
+        foreach(_configuration_type IN ITEMS
+            DEBUG
+            RELEASE
+            RELEASEMINSIZE
+            RELEASENOOPT
+        )
+            set("_${_flag_prefix}_FLAGS_${_flag_type}_${_configuration_type}" "")
         endforeach()
     endforeach()
 endforeach()
@@ -276,6 +284,20 @@ foreach(_flag_prefix IN ITEMS
                 endif()
             endforeach()
         endforeach()
+
+        foreach(_configuration_type IN ITEMS
+            DEBUG
+            RELEASE
+            RELEASEMINSIZE
+            RELEASENOOPT
+        )
+            set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_configuration_type}")
+
+            if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_flag_name})
+                string(STRIP "${${_flag_name}}" ${_flag_name})
+                set("${_flag_name}" "${${_flag_name}}" CACHE string "" FORCE)
+            endif()
+        endforeach()
     endforeach()
 endforeach()
 
@@ -300,13 +322,6 @@ foreach(_flag_prefix IN ITEMS
         CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION
         CppCommon_PREPROCESSOR_OUTPUT
     )
-        set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}")
-
-        if(NOT "${${_flag_name}}" STREQUAL "")
-            string(STRIP "${${_flag_name}}" ${_flag_name})
-            string(APPEND CMAKE_${_flag_prefix}_FLAGS " ${${_flag_name}}")
-        endif()
-
         foreach(_boolean_type IN ITEMS
             TRUE
             FALSE

@@ -1,9 +1,10 @@
 #define SHARED_OBJECT_COMPILE
 #include "shared.h"
 
-#include <memory>
+#include <cstring>                          // For memcpy
+#include <memory>                           // For std::unique_ptr
 
-#include "Lib.h"
+#include "lib.h"
 
 extern "C" {
 

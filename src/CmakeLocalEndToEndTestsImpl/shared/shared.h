@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stddef.h>
+
 #if (defined _MSC_VER)
 #   if (defined SHARED_OBJECT_COMPILE)
 #       define SHARED_LIBRARY_API __declspec(dllexport)

@@ -49,6 +49,16 @@ macro(Impl)
         ${_project_name}
         Lib
     )
+
+    target_include_directories(
+        ${_project_name} PRIVATE
+        ${_includes}
+    )
+
+    target_link_directories(
+        ${_project_name} PRIVATE
+        ${_libs}
+    )
 endmacro()
 
 Impl()
