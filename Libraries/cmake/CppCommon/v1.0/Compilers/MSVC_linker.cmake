@@ -17,11 +17,11 @@
 # ----------------------------------------------------------------------
 # |  Static Flags
 foreach(_flag IN ITEMS
-    /DYNAMICBASE                        # Randomized base address
-    /MANIFEST                           # Creates a side-by-side manifest file and optionally embeds it in the binary.
-    /NXCOMPAT                           # Data Execution Prevention
+    /DYNAMICBASE                                        # Randomized base address
+    /MANIFEST                                           # Creates a side-by-side manifest file and optionally embeds it in the binary.
+    /NXCOMPAT                                           # Data Execution Prevention
     /MANIFESTUAC:"level='asInvoker' uiAccess='false'"   # Specifies whether User Account Control (UAC) information is embedded in the program manifest.
-    /TLBID:1                            # Specifies the resource ID of the linker-generated type library.
+    /TLBID:1                                            # Specifies the resource ID of the linker-generated type library.
 )
     string(APPEND _EXE_LINKER_FLAGS " ${_flag}")
 endforeach()
@@ -29,7 +29,7 @@ endforeach()
 # The following flags are valid for MSVC but not for Clang
 if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     foreach(_flag IN ITEMS
-        /LTCG                           # Link-time code generation
+        /LTCG                               # Link-time code generation
     )
         string(APPEND _EXE_LINKER_FLAGS_RELEASE " ${_flag}")
     endforeach()
@@ -37,8 +37,8 @@ endif()
 
 # The following flags are valid for both MSVC and Clang
 foreach(_flag IN ITEMS
-    /OPT:ICF                            # Enable COMDAT Folding
-    /OPT:REF                            # References
+    /OPT:ICF                                # Enable COMDAT Folding
+    /OPT:REF                                # References
 )
     string(APPEND _EXE_LINKER_FLAGS_RELEASE " ${_flag}")
 endforeach()

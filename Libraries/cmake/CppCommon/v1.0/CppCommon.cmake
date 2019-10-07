@@ -39,8 +39,8 @@ option(
 
 option(
     CppCommon_STATIC_CRT
-    "Statically link with the CRT (default is dynamic linkage)."
-    "OFF"
+    "Statically link with the CRT."
+    "ON"
 )
 
 option(
@@ -213,12 +213,12 @@ foreach(_flag_prefix IN ITEMS
     SHARED_LINKER
     MODULE_LINKER
 )
-    set(_cached_flag_name "CMAKE_${_flag_prefix}_FLAGS")
+    set(_cmake_flag_name "CMAKE_${_flag_prefix}_FLAGS")
     set(_flag_name "_${_flag_prefix}_FLAGS")
 
     if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_flag_name}_UPDATED)
         string(STRIP "${${_flag_name}}" ${_flag_name})
-        set("${_cached_flag_name}" "${${_flag_name}}" CACHE string "" FORCE)
+        set("${_cmake_flag_name}" "${${_flag_name}}" CACHE string "" FORCE)
     endif()
 
     foreach(_configuration_type IN ITEMS
@@ -227,12 +227,12 @@ foreach(_flag_prefix IN ITEMS
         RELEASEMINSIZE
         RELEASENOOPT
     )
-        set(_cached_flag_name "CMAKE_${_flag_prefix}_FLAGS_${_configuration_type}")
+        set(_cmake_flag_name "CMAKE_${_flag_prefix}_FLAGS_${_configuration_type}")
         set(_flag_name "_${_flag_prefix}_FLAGS_${_configuration_type}")
 
         if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_flag_name}_UPDATED)
             string(STRIP "${${_flag_name}}" ${_flag_name})
-            set("${_cached_flag_name}" "${${_flag_name}}" CACHE string "" FORCE)
+            set("${_cmake_flag_name}" "${${_flag_name}}" CACHE string "" FORCE)
         endif()
     endforeach()
 
@@ -300,11 +300,11 @@ foreach(_flag_prefix IN ITEMS
         CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION
         CppCommon_PREPROCESSOR_OUTPUT
     )
-        set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}")
+        set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}")
 
-        if(NOT "${${_cached_flag_name}}" STREQUAL "")
-            string(STRIP "${${_cached_flag_name}}" ${_cached_flag_name})
-            string(APPEND CMAKE_${_flag_prefix}_FLAGS " ${${_cached_flag_name}}")
+        if(NOT "${${_flag_name}}" STREQUAL "")
+            string(STRIP "${${_flag_name}}" ${_flag_name})
+            string(APPEND CMAKE_${_flag_prefix}_FLAGS " ${${_flag_name}}")
         endif()
 
         foreach(_boolean_type IN ITEMS
@@ -315,11 +315,11 @@ foreach(_flag_prefix IN ITEMS
                 ("${_boolean_type}" MATCHES "TRUE" AND "${${_flag_type}}") OR
                 ("${_boolean_type}" MATCHES "FALSE" AND NOT "${${_flag_type}}")
             )
-                set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}")
+                set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}")
 
-                if(NOT "${${_cached_flag_name}}" STREQUAL "")
-                    string(STRIP "${${_cached_flag_name}}" ${_cached_flag_name})
-                    string(APPEND CMAKE_${_flag_prefix}_FLAGS " ${${_cached_flag_name}}")
+                if(NOT "${${_flag_name}}" STREQUAL "")
+                    string(STRIP "${${_flag_name}}" ${_flag_name})
+                    string(APPEND CMAKE_${_flag_prefix}_FLAGS " ${${_flag_name}}")
                 endif()
 
                 foreach(_config_type IN ITEMS
@@ -328,11 +328,11 @@ foreach(_flag_prefix IN ITEMS
                     RELEASEMINSIZE
                     RELEASENOOPT
                 )
-                    set(_cached_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}_${_config_type}")
+                    set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}_${_config_type}")
 
-                    if(NOT "${${_cached_flag_name}}" STREQUAL "")
-                        string(STRIP "${${_cached_flag_name}}" ${_cached_flag_name})
-                        string(APPEND CMAKE_${_flag_prefix}_FLAGS_${_config_type} " ${${_cached_flag_name}}")
+                    if(NOT "${${_flag_name}}" STREQUAL "")
+                        string(STRIP "${${_flag_name}}" ${_flag_name})
+                        string(APPEND CMAKE_${_flag_prefix}_FLAGS_${_config_type} " ${${_flag_name}}")
                     endif()
                 endforeach()
             endif()

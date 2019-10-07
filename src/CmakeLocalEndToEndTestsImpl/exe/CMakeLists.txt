@@ -1,22 +1,10 @@
-# Template CMakeLists.txt file.
-#
-#   Replace the following when using this template:
-#       - <project_name>
-#       - <project_version_major>, <project_version_minor>, <project_version_patch>
-#       - <project_files>
-#       - <unit_test_file>
-#
-
 cmake_minimum_required(VERSION 3.5.0)
 
-# If this is being invoked within a .cmake file (rather than in CMakeLists.txt),
-# change this `macro` to a `function`.
 macro(Impl)
-    # Defining a function here to introduce a new scope for local variables
-    set(_project_name <project_name>)
-    set(_${_project_name}_version_major <project_version_major>)
-    set(_${_project_name}_version_minor <project_version_minor>)
-    set(_${_project_name}_version_patch <project_version_patch>)
+    set(_project_name Exe)
+    set(_${_project_name}_version_major 2)
+    set(_${_project_name}_version_minor 0)
+    set(_${_project_name}_version_patch a1)
     set(_${_project_name}_version ${_${_project_name}_version_major}.${_${_project_name}_version_minor}.${_${_project_name}_version_patch})
 
     # Alpha version components (which are supported in SemVer) present problems
@@ -44,9 +32,11 @@ macro(Impl)
     # All paths should be relative to `${_this_path}`.
     get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 
+    include(${_this_path}/../lib/lib.cmake)
+
     add_executable(
         ${_project_name}
-        <project_files>
+        exe.cpp
     )
 
     set_target_properties(
@@ -55,33 +45,10 @@ macro(Impl)
         SOVERSION ${_${_project_name}_version_major}
     )
 
-    enable_testing()
-
-    foreach(_test_name IN ITEMS
-        <unit_test_file>_UnitTest
+    target_link_libraries(
+        ${_project_name}
+        Lib
     )
-        add_executable(
-            ${_test_name}
-            ${_test_name}.cpp
-        )
-
-        # target_link_libraries(
-        #     ${_test_name}
-        #     <library_name>
-        # )
-
-        target_include_directories(
-            ${_test_name} PRIVATE
-            ${_includes}
-        )
-
-        target_link_directories(
-            ${_test_name} PRIVATE
-            ${_libs}
-        )
-
-        add_test(NAME ${_test_name} COMMAND ${_test_name} --success)
-    endforeach()
 endmacro()
 
 Impl()
