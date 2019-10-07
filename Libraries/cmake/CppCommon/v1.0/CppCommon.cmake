@@ -40,7 +40,7 @@ option(
 option(
     CppCommon_STATIC_CRT
     "Statically link with the CRT."
-    "ON"
+    "OFF"
 )
 
 option(
