@@ -43,9 +43,6 @@ foreach(_flag IN ITEMS
     -D_GLIBCXX_ASSERTIONS                   # Run-time bounds checking for C++ strings and containers
     -fstack-protector-strong                # Stack smashing protection
     -O3                                     # Advanced optimizations
-    -Wl,-z,defs                             # Detect and reject underlinking
-    -Wl,-z,now                              # Disable lazy binding
-    -Wl,-z,relro                            # Read-only segments after relocation
 )
     string(APPEND _CXX_FLAGS_RELEASE " ${_flag}")
 endforeach()
@@ -58,9 +55,6 @@ foreach(_flag IN ITEMS
     -D_GLIBCXX_ASSERTIONS                   # Run-time bounds checking for C++ strings and containers
     -fstack-protector-strong                # Stack smashing protection
     -Os                                     # Optimize for small code
-    -Wl,-z,defs                             # Detect and reject underlinking
-    -Wl,-z,now                              # Disable lazy binding
-    -Wl,-z,relro                            # Read-only segments after relocation
 )
     string(APPEND _CXX_FLAGS_RELEASEMINSIZE " ${_flag}")
 endforeach()
@@ -73,12 +67,27 @@ foreach(_flag IN ITEMS
     -D_GLIBCXX_ASSERTIONS                   # Run-time bounds checking for C++ strings and containers
     -fstack-protector-strong                # Stack smashing protection
     -O0                                     # No optimizations
-    -Wl,-z,defs                             # Detect and reject underlinking
-    -Wl,-z,now                              # Disable lazy binding
-    -Wl,-z,relro                            # Read-only segments after relocation
 )
     string(APPEND _CXX_FLAGS_RELEASENOOPT " ${_flag}")
 endforeach()
+
+if(APPLE)
+    # Do not add additional flags
+else()
+    foreach(_dest_flag IN ITEMS
+        _CXX_FLAGS_RELEASE
+        _CXX_FLAGS_RELEASEMINSIZE
+        _CXX_FLAGS_RELEASENOOPT
+    )
+        foreach(_flag IN ITEMS
+            -Wl,-z,defs                     # Detect and reject underlinking
+            -Wl,-z,now                      # Disable lazy binding
+            -Wl,-z,relro                    # Read-only segments after relocation
+        )
+            string(APPEND ${_dest_flag} " ${_flag}")
+        endforeach()
+    endforeach()
+endif()
 
 # ----------------------------------------------------------------------
 # |  Dynamic Flags
