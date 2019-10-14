@@ -64,7 +64,7 @@ class LibSuite(unittest.TestCase):
 
             self.assertTrue(
                 os.path.isfile(os.path.join(temp_dir, "Lib.lib"))
-                or os.path.isfile(os.path.join(temp_dir, "Lib.a")),
+                or os.path.isfile(os.path.join(temp_dir, "libLib.a")),
             )
 
 
@@ -144,7 +144,7 @@ class SharedSuite(unittest.TestCase):
 
             self.assertTrue(
                 os.path.isfile(os.path.join(temp_dir, "Shared.dll"))
-                or os.path.isfile(os.path.join(temp_dir, "Shared.so")),
+                or os.path.isfile(os.path.join(temp_dir, "libShared.so")),
             )
 
 
