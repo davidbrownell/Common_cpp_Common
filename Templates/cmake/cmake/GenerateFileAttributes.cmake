@@ -59,7 +59,7 @@ function(generate_file_attributes outfiles)
         PRODUCT_VERSION_MAJOR
         PRODUCT_VERSION_MINOR
     )
-        if(NOT ${_arg} OR "${${_arg}}" STREQUAL "")
+        if("${${_arg}}" STREQUAL "")
             MESSAGE(FATAL_ERROR "'${_arg}' is a required parameter")
         endif()
     endforeach()

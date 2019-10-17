@@ -17,6 +17,7 @@ Activate.*.sh
 coverage.xml
 
 .vscode/*
+**/build/*
 
 Tools/cmake/v3.13.4/BSD/*
 Tools/cmake/v3.13.4/Linux/*
