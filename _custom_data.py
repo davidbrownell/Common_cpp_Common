@@ -39,6 +39,10 @@ _CUSTOM_DATA                                = [
                         "Linux",
                         "8cdb78b6d2919be9cc276f2c7954198aab25435f6d2a2f0fc683b9055c3f141a",
                     ),
+                    (
+                        "BSD",
+                        "629b34ba7daa67f82aa66ca5f4973b27a9f7e7aa2fa5a823dc7f225f74757e3f",
+                    )
                 ],
             ),
         ],
@@ -93,6 +97,10 @@ _CUSTOM_DATA                                = [
                         "Linux",
                         "cc9f3ed1431fd9008062143272f4701d3d13dc55a75ee860353f88cb7035d63b",
                     ),
+                    (
+                        "BSD",
+                        "94df6c773726e6465d89367d8e2049af82dbffc486fe7d9c25396b62be45c325",
+                    )
                 ],
             ),
         ],
