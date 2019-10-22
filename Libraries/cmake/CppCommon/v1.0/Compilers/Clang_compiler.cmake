@@ -17,10 +17,11 @@
 # ----------------------------------------------------------------------
 # |  Static Flags
 foreach(_flag IN ITEMS
-    -fasynchronous-unwind-tables        # Increased reliability of backtraces
-    -fexceptions                        # Enable table-based thread cancellation
-    -fvisibility=hidden                 # Symbols in shared libraries are hidden by default (which is consistent with Windows)
-    -pipe                               # Avoid temporary files
+    -fasynchronous-unwind-tables            # Increased reliability of backtraces
+    -fexceptions                            # Enable table-based thread cancellation
+    -fvisibility=hidden                     # Symbols in shared libraries are hidden by default (which is consistent with Windows)
+    -pipe                                   # Avoid temporary files
+    -Wl,-rpath,'\$\$ORIGIN'                 # Look for libs in the same dir
 )
     string(APPEND _CXX_FLAGS " ${_flag}")
 endforeach()
@@ -29,7 +30,7 @@ endforeach()
 foreach(_flag IN ITEMS
     -DDEBUG
     -D_DEBUG
-    -O0                                 # No optimizations
+    -O0                                     # No optimizations
 )
     string(APPEND _CXX_FLAGS_DEBUG " ${_flag}")
 endforeach()
@@ -38,13 +39,10 @@ endforeach()
 foreach(_flag IN ITEMS
     -DNDEBUG
     -D_NDEBUG
-    -D_FORTIFY_SOURCE=2                 # Run-time buffer overflow detection
-    -D_GLIBCXX_ASSERTIONS               # Run-time bounds checking for C++ strings and containers
-    -fstack-protector-strong            # Stack smashing protection
-    -O3                                 # Advanced optimizations
-    -Wl,-z,defs                         # Detect and reject underlinking
-    -Wl,-z,now                          # Disable lazy binding
-    -Wl,-z,relro                        # Read-only segments after relocation
+    -D_FORTIFY_SOURCE=2                     # Run-time buffer overflow detection
+    -D_GLIBCXX_ASSERTIONS                   # Run-time bounds checking for C++ strings and containers
+    -fstack-protector-strong                # Stack smashing protection
+    -O3                                     # Advanced optimizations
 )
     string(APPEND _CXX_FLAGS_RELEASE " ${_flag}")
 endforeach()
@@ -53,13 +51,10 @@ endforeach()
 foreach(_flag IN ITEMS
     -DNDEBUG
     -D_NDEBUG
-    -D_FORTIFY_SOURCE=2                 # Run-time buffer overflow detection
-    -D_GLIBCXX_ASSERTIONS               # Run-time bounds checking for C++ strings and containers
-    -fstack-protector-strong            # Stack smashing protection
-    -Os                                 # Optimize for small code
-    -Wl,-z,defs                         # Detect and reject underlinking
-    -Wl,-z,now                          # Disable lazy binding
-    -Wl,-z,relro                        # Read-only segments after relocation
+    -D_FORTIFY_SOURCE=2                     # Run-time buffer overflow detection
+    -D_GLIBCXX_ASSERTIONS                   # Run-time bounds checking for C++ strings and containers
+    -fstack-protector-strong                # Stack smashing protection
+    -Os                                     # Optimize for small code
 )
     string(APPEND _CXX_FLAGS_RELEASEMINSIZE " ${_flag}")
 endforeach()
@@ -68,16 +63,31 @@ endforeach()
 foreach(_flag IN ITEMS
     -DNDEBUG
     -D_NDEBUG
-    -D_FORTIFY_SOURCE=2                 # Run-time buffer overflow detection
-    -D_GLIBCXX_ASSERTIONS               # Run-time bounds checking for C++ strings and containers
-    -fstack-protector-strong            # Stack smashing protection
-    -O0                                 # No optimizations
-    -Wl,-z,defs                         # Detect and reject underlinking
-    -Wl,-z,now                          # Disable lazy binding
-    -Wl,-z,relro                        # Read-only segments after relocation
+    -D_FORTIFY_SOURCE=2                     # Run-time buffer overflow detection
+    -D_GLIBCXX_ASSERTIONS                   # Run-time bounds checking for C++ strings and containers
+    -fstack-protector-strong                # Stack smashing protection
+    -O0                                     # No optimizations
 )
     string(APPEND _CXX_FLAGS_RELEASENOOPT " ${_flag}")
 endforeach()
+
+if(APPLE)
+    # Do not add additional flags
+else()
+    foreach(_dest_flag IN ITEMS
+        _CXX_FLAGS_RELEASE
+        _CXX_FLAGS_RELEASEMINSIZE
+        _CXX_FLAGS_RELEASENOOPT
+    )
+        foreach(_flag IN ITEMS
+            -Wl,-z,defs                     # Detect and reject underlinking
+            -Wl,-z,now                      # Disable lazy binding
+            -Wl,-z,relro                    # Read-only segments after relocation
+        )
+            string(APPEND ${_dest_flag} " ${_flag}")
+        endforeach()
+    endforeach()
+endif()
 
 # ----------------------------------------------------------------------
 # |  Dynamic Flags
@@ -91,8 +101,8 @@ set(_CXX_FLAGS_CppCommon_STATIC_CRT_TRUE "-static-libstdc++")
 
 # CppCommon_NO_DEBUG_INFO
 foreach(_flag IN ITEMS
-    -g                                  # Generate debugging information
-    -grecord-gcc-switches               # Store compiler flags in debugging information
+    -g                                      # Generate debugging information
+    -grecord-gcc-switches                   # Store compiler flags in debugging information
 )
     string(APPEND _CXX_FLAGS_CppCommon_NO_DEBUG_INFO_FALSE " ${_flag}")
 endforeach()

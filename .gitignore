@@ -15,7 +15,9 @@ Activate.*.sh
 coverage.xml
 
 .vscode/*
+**/build/*
 
+Tools/cmake/v3.13.4/BSD/*
 Tools/cmake/v3.13.4/Linux/*
 Tools/cmake/v3.13.4/Windows/*
 
@@ -25,6 +27,7 @@ Tools/Doxygen/v1.8.16/Windows/*
 Tools/graphviz/v2.38.0/Linux/*
 Tools/graphviz/v2.38.0/Windows/*
 
+Tools/ninja/v1.9.0/BSD/*
 Tools/ninja/v1.9.0/Linux/*
 Tools/ninja/v1.9.0/Windows/*
 
