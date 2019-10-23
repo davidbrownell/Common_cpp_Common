@@ -152,6 +152,11 @@ def GetCustomActions(
         ),
     )
 
+    # Add the root for this repo
+    actions.append(
+        CurrentShell.Commands.Set("DEVELOPMENT_ENVIRONMENT_CPP_COMMON_ROOT", _script_dir),
+    )
+
     # Add scripts that augment existing functionality
     actions += DynamicPluginArchitecture.CreateRegistrationStatements(
         "DEVELOPMENT_ENVIRONMENT_COMPILERS",
