@@ -110,6 +110,8 @@ function(generate_file_attributes outfiles)
         set(PRODUCT_INTERNAL_NAME "${PRODUCT_NAME}")
     endif()
 
+    MESSAGE(STATUS_MESSAGE "\n\nProduct version for '${PRODUCT_NAME}' is '${PRODUCT_VERSION_MAJOR}.${PRODUCT_VERSION_MINOR}.${PRODUCT_VERSION_PATCH}${PRODUCT_VERSION_PRERELEASE_INFO}${PRODUCT_VERSION_BUILD_INFO}'\n\n")
+
     # Apply
     set(PRODUCT_VERSION_SUFFIX "${PRODUCT_VERSION_PRERELEASE_INFO}${PRODUCT_VERSION_BUILD_INFO}")
 
@@ -117,19 +119,19 @@ function(generate_file_attributes outfiles)
     set(_resource_filename ${CMAKE_CURRENT_BINARY_DIR}/${PRODUCT_NAME}.FileAttributes.rc)
 
     configure_file(
-        ${_generate_file_attributes_this_dir}/FileAttributes.in.json
+        ${_generate_file_attributes_this_dir}/FileAttributes/FileAttributes.in.json
         ${CMAKE_CURRENT_BINARY_DIR}/${PRODUCT_NAME}.FileAttributes.json
         @ONLY
     )
 
     configure_file(
-        ${_generate_file_attributes_this_dir}/FileAttributes.in.h
+        ${_generate_file_attributes_this_dir}/FileAttributes/FileAttributes.in.h
         ${_header_filename}
         @ONLY
     )
 
     configure_file(
-        ${_generate_file_attributes_this_dir}/FileAttributes.in.rc
+        ${_generate_file_attributes_this_dir}/FileAttributes/FileAttributes.in.rc
         ${_resource_filename}
         @ONLY
     )
