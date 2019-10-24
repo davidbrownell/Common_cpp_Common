@@ -34,12 +34,10 @@ function(Impl)
     endif()
 
     include(CppCommon)
-
-    include(${_shared_this_path}/../lib/lib.cmake)
-    include(${_shared_this_path}/cmake/GenerateFileAttributes.cmake)
+    include(GenerateFileAttributes)
 
     generate_file_attributes(
-        _file_attribute_sources
+        _shared_file_attribute_sources
         NAME ${_project_name}
         COMPANY_NAME MyCompany
         VERSION_MAJOR ${_version_major}
@@ -49,13 +47,14 @@ function(Impl)
         VERSION_BUILD_INFO ${_version_build_info}
     )
 
+    include(${_shared_this_path}/../lib/lib.cmake)
 
     add_library(
         ${_project_name}
         SHARED
         ${_shared_this_path}/shared.cpp
         ${_shared_this_path}/shared.h
-        ${_file_attribute_sources}
+        ${_shared_file_attribute_sources}
     )
 
     set_target_properties(
