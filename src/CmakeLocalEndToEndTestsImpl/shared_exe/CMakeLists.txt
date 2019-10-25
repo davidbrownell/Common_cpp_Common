@@ -32,15 +32,10 @@ macro(Impl)
     endif()
 
     include(CppCommon)
-
-    # Do not use `_this_path` if this is a module.
-    get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
-
-    include(${_this_path}/cmake/GenerateFileAttributes.cmake)
-    include(${_this_path}/../shared/shared.cmake)
+    include(GenerateFileAttributes)
 
     generate_file_attributes(
-        _file_attribute_sources
+        _shared_exe_file_attribute_sources
         NAME ${_project_name}
         COMPANY_NAME MyCompany
         VERSION_MAJOR ${_version_major}
@@ -50,10 +45,15 @@ macro(Impl)
         VERSION_BUILD_INFO ${_version_build_info}
     )
 
+    # Do not use `_this_path` if this is a module.
+    get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
+
+    include(${_this_path}/../shared/shared.cmake)
+
     add_executable(
         ${_project_name}
         shared_exe.cpp
-        ${_file_attribute_sources}
+        ${_shared_exe_file_attribute_sources}
     )
 
     set_target_properties(
