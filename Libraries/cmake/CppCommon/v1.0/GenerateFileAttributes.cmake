@@ -90,7 +90,7 @@ function(generate_file_attributes outfiles)
     endif()
 
     if(NOT PRODUCT_ICON OR "${PRODUCT_ICON}" STREQUAL "")
-        set(PRODUCT_ICON "${CMAKE_SOURCE_DIR}/product.ico")
+        set(PRODUCT_ICON "product.ico")
     endif()
 
     if(NOT PRODUCT_COPYRIGHT OR "${PRODUCT_COPYRIGHT}" STREQUAL "")
