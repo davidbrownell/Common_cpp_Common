@@ -32,6 +32,7 @@ foreach(_flag IN ITEMS
     -Wno-missing-prototypes
     -Wno-reserved-id-macro
     -Wno-unused-command-line-argument
+    -Wno-unused-member-function
     -Wno-unused-template
 )
     string(APPEND _CXX_FLAGS " ${_flag}")
