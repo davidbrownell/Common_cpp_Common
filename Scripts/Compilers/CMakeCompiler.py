@@ -107,12 +107,8 @@ class Compiler(
             if dest_filename == filename:
                 continue
 
-            if os.path.isfile(dest_filename):
-                raise Exception(
-                    "The file '{}' already exists ({})".format(dest_filename, filename),
-                )
-
-            shutil.copyfile(filename, dest_filename)
+            if not os.path.isfile(dest_filename):
+                shutil.copyfile(filename, dest_filename)
 
         for potential_dir in ["CMakeFiles", "Testing"]:
             potential_dir = os.path.join(output_dir, potential_dir)
