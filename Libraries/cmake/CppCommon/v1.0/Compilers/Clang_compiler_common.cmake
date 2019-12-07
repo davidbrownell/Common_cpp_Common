@@ -51,7 +51,9 @@ endif()
 
 # CppCommon_CODE_COVERAGE
 foreach(_flag IN ITEMS
-    --coverage
+    --coverage                              # For use with gcov (generates "*.gcno" and "*.gcna")
+    -fprofile-instr-generate                # For use with llvm-cov (generates "default.profraw")
+    -fcoverage-mapping                      # For use with llvm-cov (generates "default.profraw")
 )
     string(APPEND _CXX_FLAGS_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
 endforeach()
