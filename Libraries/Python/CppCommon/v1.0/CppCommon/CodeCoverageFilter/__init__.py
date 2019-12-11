@@ -62,32 +62,39 @@ def GetFilters(filename):
 
         dirname = potential_dirname
 
-    yaml_filenames.reverse()
+    nonlocals = CommonEnvironment.Nonlocals(
+        includes=[],
+        excludes=[],
+    )
 
-    includes = []
-    excludes = []
+    # ----------------------------------------------------------------------
+    def ProcessFilter(filter):
+        nonlocals.includes += filter.includes
+        nonlocals.excludes += filter.excludes
 
-    found_exclusive = False
+        return filter.continue_processing
+
+    # ----------------------------------------------------------------------
+
+    should_continue = True
 
     for yaml_filename in yaml_filenames:
         obj = _Load(yaml_filename)
 
-        includes += obj.filter.includes
-        excludes += obj.filter.excludes
+        if obj.filter is not None:
+            if ProcessFilter(obj.filter) is False:
+                break
 
         for named_filter in obj.named_filters:
             if fnmatch(filename, named_filter.glob):
-                includes += named_filter.includes
-                excludes += named_filter.excludes
-
-                if named_filter.exclusive:
-                    found_exclusive = True
+                should_continue = ProcessFilter(named_filter)
+                if not should_continue:
                     break
 
-        if found_exclusive:
+        if not should_continue:
             break
 
-    return includes, excludes
+    return nonlocals.includes, nonlocals.excludes
 
 
 # ----------------------------------------------------------------------
