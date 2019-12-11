@@ -67,6 +67,8 @@ def GetFilters(filename):
     includes = []
     excludes = []
 
+    found_exclusive = False
+
     for yaml_filename in yaml_filenames:
         obj = _Load(yaml_filename)
 
@@ -77,6 +79,13 @@ def GetFilters(filename):
             if fnmatch(filename, named_filter.glob):
                 includes += named_filter.includes
                 excludes += named_filter.excludes
+
+                if named_filter.exclusive:
+                    found_exclusive = True
+                    break
+
+        if found_exclusive:
+            break
 
     return includes, excludes
 

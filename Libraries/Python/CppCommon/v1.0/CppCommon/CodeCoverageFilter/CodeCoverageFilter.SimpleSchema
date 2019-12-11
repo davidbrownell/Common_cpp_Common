@@ -6,6 +6,9 @@
   <includes string *>
   <excludes string *>
 
-# These apply to any descendant file matching the glob pattern 
+# These apply to any descendant file matching the glob pattern
 <named_filters filter *>:
   [glob string]
+
+  # If true, no other filter (named or otherwise) will be applied
+  [exclusive bool default="false" ?]
