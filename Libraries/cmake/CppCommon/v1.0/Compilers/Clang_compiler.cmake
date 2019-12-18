@@ -21,7 +21,7 @@ foreach(_flag IN ITEMS
     -fexceptions                            # Enable table-based thread cancellation
     -fvisibility=hidden                     # Symbols in shared libraries are hidden by default (which is consistent with Windows)
     -pipe                                   # Avoid temporary files
-    -Wl,-rpath,'\$\$ORIGIN'                 # Look for libs in the same dir
+    -Wl,-rpath,'\$ORIGIN'                   # Look for libs in the same dir
 )
     string(APPEND _CXX_FLAGS " ${_flag}")
 endforeach()
