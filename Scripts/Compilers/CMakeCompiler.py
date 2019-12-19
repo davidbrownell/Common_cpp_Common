@@ -145,6 +145,7 @@ class Compiler(
             ("use_unicode", False),
             ("static_crt", True),
             ("is_profile", False),
+            ("is_benchmark", False),
             ("disable_debug_info", False),
             ("disable_aslr", False),
         ] + super(Compiler, cls)._GetOptionalMetadata()
@@ -254,10 +255,13 @@ def Compile(
     input,
     generator=None,
     release=False,
-    profile=False,
-    disable_debug_info=False,
+    cmake_debug_output=False,
+    unicode=False,
     no_static_crt=False,
-    use_unicode=False,
+    profile=False,
+    benchmark=False,
+    disable_debug_info=False,
+    disable_aslr=False,
     output_stream=sys.stdout,
     verbose=False,
 ):
@@ -273,10 +277,13 @@ def Compile(
         verbose,
         output_dir=output_dir,
         is_debug=not release,
-        is_profile=profile,
-        disable_debug_info=disable_debug_info,
+        cmake_debug_output=cmake_debug_output,
+        use_unicode=unicode,
         static_crt=not no_static_crt,
-        use_unicode=use_unicode,
+        is_profile=profile,
+        is_benchmark=benchmark,
+        disable_debug_info=disable_debug_info,
+        disable_aslr=disable_aslr,
     )
 
 
