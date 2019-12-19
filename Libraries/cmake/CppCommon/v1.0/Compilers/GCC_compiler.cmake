@@ -24,7 +24,7 @@ foreach(_flag IN ITEMS
     -W
     -Wall                                   # All warnings
     -Werror                                 # Treat warnings as errors
-    -Wl,-rpath,'\$ORIGIN'                   # Look for libs in the same dir
+    -Wl,-rpath,'\\\$ORIGIN'                 # Look for libs in the same dir
     -Wno-unused-local-typedefs
 )
     string(APPEND _CXX_FLAGS " ${_flag}")
