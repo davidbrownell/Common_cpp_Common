@@ -57,9 +57,14 @@ class TestParser(TestParserImpl):
     @staticmethod
     @Interface.override
     def CreateInvokeCommandLine(context, debug_on_error):
+        is_profile_or_benchmark = context.get("is_profile", False) or context.get(
+            "is_benchmark",
+            False,
+        )
+
         return 'cd "{output_dir}" && ctest --verbose{parallel}'.format(
             output_dir=context["output_dir"],
-            parallel=" --parallel" if not context.get("is_profile", False) else "",
+            parallel=" --parallel" if is_profile_or_benchmark else "",
         )
 
     # ----------------------------------------------------------------------
