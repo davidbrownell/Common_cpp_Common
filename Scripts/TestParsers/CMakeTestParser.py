@@ -16,11 +16,14 @@
 """Contains the TestParser object"""
 
 import os
+import re
 
 import CommonEnvironment
 from CommonEnvironment import FileSystem
 from CommonEnvironment import Interface
 from CommonEnvironment.TestParserImpl import TestParserImpl
+
+from Catch2TestParser import ExtractBenchmarkOutput as ExtractCatch2BenchmarkOutput
 
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
@@ -45,13 +48,36 @@ class TestParser(TestParserImpl):
         return compiler.Name == "CMake"
 
     # ----------------------------------------------------------------------
-    @classmethod
+    @staticmethod
     @Interface.override
-    def Parse(cls, test_data):
-        if "100% tests passed" in test_data:
-            return 0
+    def Parse(test_data):
+        if "100% tests passed" not in test_data:
+            return -1
 
-        return -1
+        # CTest will append an index before each line of the test output -
+        # remove that if it exists.
+        line_regex = re.compile(r"^\d+: (?P<content>.*)")
+
+        lines = test_data.split("\n")
+        for index, line in enumerate(lines):
+            match = line_regex.match(line)
+            if not match:
+                continue
+
+            lines[index] = match.group("content")
+
+        scrubbed_test_data = "\n".join(lines)
+
+        # CTest can wrap many individual test frameworks - attempt to extract benchmark
+        # data from well-know test frameworks.
+        benchmark_data = None
+
+        for extract_func in [ExtractCatch2BenchmarkOutput]:
+            benchmark_data = extract_func(scrubbed_test_data)
+            if benchmark_data:
+                return 0, benchmark_data
+
+        return 0
 
     # ----------------------------------------------------------------------
     @staticmethod
@@ -74,7 +100,3 @@ class TestParser(TestParserImpl):
         for potential_dir in ["Testing"]:
             potential_dir = os.path.join(context["output_dir"], potential_dir)
             FileSystem.RemoveTree(potential_dir)
-
-        for potential_file in ["CTestTestfile.cmake"]:
-            potential_file = os.path.join(context["output_dir"], potential_file)
-            FileSystem.RemoveFile(potential_file)
