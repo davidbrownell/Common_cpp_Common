@@ -123,7 +123,7 @@ _ExtractBenchmarkOutput_benchmarks_regex    = re.compile(
 _ExtractBenchmarkOutput_stats_regex         = re.compile(
     textwrap.dedent(
         r"""(?#
-        Name            )(?P<name>.+?)(?#
+        Name            )(?P<name>[^\n]+?)(?#
         Samples         )\s+(?P<samples>\d+)(?#
         Iterations      )\s+(?P<iterations>\d+)(?#
         Estimated       )\s+(?P<estimated>[\d\.]+) (?P<estimated_units>\S+)(?#
