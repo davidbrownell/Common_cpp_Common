@@ -18,7 +18,7 @@ cmake_minimum_required(VERSION 3.5.0)
 #
 #   1) Change the `macro` below to a `function`
 #   2) Instead of using the `_this_path` variable, uncomment the file-scoped var
-#      and use that value instead.
+#      and use that value everywhere that `_this_path` is used below.
 
 # Uncomment the following line if this is a module:
 #
@@ -57,6 +57,9 @@ macro(Impl)
 
     include(CppCommon)
 
+    # Uncomment the following lines to generate file attributes that are embedded
+    # into the binary.
+
     # include(GenerateFileAttributes)
     #
     # generate_file_attributes(
@@ -70,7 +73,6 @@ macro(Impl)
     #     VERSION_BUILD_INFO ${_version_build_info}
     # )
 
-    # Do not use `_this_path` if this is a module.
     get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 
     add_executable(
@@ -125,7 +127,11 @@ macro(Impl)
             ${_libs}
         )
 
-        add_test(NAME ${_test_name} COMMAND ${_test_name} --success)
+        add_test(NAME ${_test_name} COMMAND ${_test_name} ~[benchmark] --success)
+
+        if(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+            add_test(NAME ${_test_name} COMMAND ${_test_name} [benchmark])
+        endif()
     endforeach()
 endmacro()
 
