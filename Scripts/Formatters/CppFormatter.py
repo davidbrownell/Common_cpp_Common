@@ -37,7 +37,7 @@ from CommonEnvironment.TypeInfo.FundamentalTypes.FilenameTypeInfo import Filenam
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
 _script_dir, _script_name                   = os.path.split(_script_fullpath)
-#  ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 # Import this module here so that it is available to plugins, thereby preventing
 # them from having to do a wonky import of an __init__.py file.
@@ -106,7 +106,7 @@ class Formatter(FormatterImpl):
         **plugin_args
     ):
         cls.__clsinit__(*plugin_input_dirs)
-        
+
         if FileSystem.IsFilename(filename_or_content):
             with open(filename_or_content) as f:
                 filename_or_content = f.read()
@@ -179,7 +179,7 @@ class Formatter(FormatterImpl):
                 continuation_block_id = None
 
             lines.append(line)
-        
+
         # Decorate the lines
         for plugin in plugins:
             args = []

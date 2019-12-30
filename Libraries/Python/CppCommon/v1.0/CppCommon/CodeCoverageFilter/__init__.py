@@ -30,7 +30,7 @@ from CommonEnvironment.CallOnExit import CallOnExit
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
 _script_dir, _script_name                   = os.path.split(_script_fullpath)
-#  ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 sys.path.insert(0, os.path.join(_script_dir, "GeneratedCode"))
 with CallOnExit(lambda: sys.path.pop(0)):
