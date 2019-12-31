@@ -24,7 +24,7 @@ from CommonEnvironment import Interface
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
 _script_dir, _script_name                   = os.path.split(_script_fullpath)
-#  ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
 class PluginBase(FormatterPluginBase):
@@ -39,7 +39,7 @@ class PluginBase(FormatterPluginBase):
         ):
             self.content                    = content
             self.continuation_block_id      = continuation_block_id
-            
+
         # ----------------------------------------------------------------------
         def __repr__(self):
             return CommonEnvironment.ObjectReprImpl(self)
@@ -99,7 +99,7 @@ class PluginBase(FormatterPluginBase):
         nonlocals = CommonEnvironment.Nonlocals(
             index=0,
         )
-    
+
         if include_next_line_func:
             # ----------------------------------------------------------------------
             def SetNextLine(index):

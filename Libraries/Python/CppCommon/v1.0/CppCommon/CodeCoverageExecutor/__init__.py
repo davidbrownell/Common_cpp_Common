@@ -24,7 +24,7 @@ from CommonEnvironment import Process
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
 _script_dir, _script_name                   = os.path.split(_script_fullpath)
-#  ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
 class CodeCoverageExecutor(Interface.Interface):
@@ -46,7 +46,7 @@ class CodeCoverageExecutor(Interface.Interface):
     @Interface.extensionmethod
     def PreprocessBinary(binary_filename, output_stream):
         """Decorate the binary if necessary.
-        
+
         Returns result_code.
         """
         return 0
@@ -55,8 +55,8 @@ class CodeCoverageExecutor(Interface.Interface):
     @staticmethod
     @Interface.extensionmethod
     def StartCoverage(coverage_filename, output_stream):
-        """Initializes code coverage functionality if necessary. 
-        
+        """Initializes code coverage functionality if necessary.
+
         Returns result_code.
         """
         return 0
@@ -66,7 +66,7 @@ class CodeCoverageExecutor(Interface.Interface):
     @Interface.extensionmethod
     def Execute(command_line, output_stream):
         """Executes the command line
-        
+
         Returns result_code."""
         return Process.Execute(command_line, output_stream)
 
@@ -75,7 +75,7 @@ class CodeCoverageExecutor(Interface.Interface):
     @Interface.extensionmethod
     def StopCoverage(output_stream):
         """Stops code coverage processing and returns a data filename that contains coverage information
-        
+
         Returns result_code."""
         return 0
 
