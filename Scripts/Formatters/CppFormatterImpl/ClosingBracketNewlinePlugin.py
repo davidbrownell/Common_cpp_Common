@@ -25,16 +25,16 @@ from CommonEnvironment import Interface
 # ----------------------------------------------------------------------
 _script_fullpath                            = CommonEnvironment.ThisFullpath()
 _script_dir, _script_name                   = os.path.split(_script_fullpath)
-#  ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 
 # This is available because it is imported in CppFormatter.py
 from CppFormatterImpl import PluginBase
-         
+
 # ----------------------------------------------------------------------
 @Interface.staticderived
 class Plugin(PluginBase):
     """\
-    Ensures that the closing bracket associated with bin-packed items 
+    Ensures that the closing bracket associated with bin-packed items
     appear on a newline that is horizontally aligned with the line
     that contains the opening bracket.
     """
@@ -93,10 +93,10 @@ class Plugin(PluginBase):
         # ----------------------------------------------------------------------
 
         line_index = 0
-        
+
         while line_index < len(lines):
             line = lines[line_index].content.rstrip()
-            
+
             for opening, closing in six.iteritems(brackets):
                 if line.endswith(opening):
                     UpdateClosingBracket(line_index, opening, closing)
