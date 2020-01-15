@@ -57,13 +57,16 @@ macro(Impl)
 
     include(CppCommon)
 
-    # Uncomment the following lines to generate file attributes that are embedded
-    # into the binary.
+    # To generate file attributes that are embedded into the binary:
+    #
+    #   1) Uncomment the following lines
+    #   2) Uncomment the line in the call to `add_executable`
+    #
 
     # include(GenerateFileAttributes)
     #
     # generate_file_attributes(
-    #     _<project_name>_file_attribute_sources
+    #     _${_project_name}_file_attribute_sources
     #     NAME ${_project_name}
     #     COMPANY_NAME <company_name>
     #     VERSION_MAJOR ${_version_major}
@@ -78,7 +81,7 @@ macro(Impl)
     add_executable(
         ${_project_name}
         <project_files>
-        # _<project_name>_file_attribute_sources
+        # ${_${_project_name}_file_attribute_sources}
     )
 
     set_target_properties(
@@ -127,8 +130,12 @@ macro(Impl)
             ${_libs}
         )
 
+        # Run all tests with verbose output except those tagged with "[benchmark]"
         add_test(NAME ${_test_name} COMMAND ${_test_name} ~[benchmark] --success)
 
+        # If not in release mode, run tests tagged with "[benchmark]". Note that we
+        # don't want to run with verbose output in this scenario, as that output will
+        # prevent accurate benchmark statistics.
         if(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
             add_test(NAME ${_test_name} COMMAND ${_test_name} [benchmark])
         endif()
