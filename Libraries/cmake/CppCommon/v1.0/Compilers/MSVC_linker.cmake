@@ -23,7 +23,7 @@ foreach(_flag IN ITEMS
     /MANIFESTUAC:"level='asInvoker' uiAccess='false'"   # Specifies whether User Account Control (UAC) information is embedded in the program manifest.
     /TLBID:1                                            # Specifies the resource ID of the linker-generated type library.
 )
-    string(APPEND _EXE_LINKER_FLAGS " ${_flag}")
+    STRING(APPEND _EXE_LINKER_FLAGS " ${_flag}")
 endforeach()
 
 # The following flags are valid for MSVC but not for Clang
@@ -31,7 +31,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES MSVC)
     foreach(_flag IN ITEMS
         /LTCG                               # Link-time code generation
     )
-        string(APPEND _EXE_LINKER_FLAGS_RELEASE " ${_flag}")
+        STRING(APPEND _EXE_LINKER_FLAGS_RELEASE " ${_flag}")
     endforeach()
 endif()
 
@@ -40,7 +40,7 @@ foreach(_flag IN ITEMS
     /OPT:ICF                                # Enable COMDAT Folding
     /OPT:REF                                # References
 )
-    string(APPEND _EXE_LINKER_FLAGS_RELEASE " ${_flag}")
+    STRING(APPEND _EXE_LINKER_FLAGS_RELEASE " ${_flag}")
 endforeach()
 
 set(_EXE_LINKER_FLAGS_RELEASEMINSIZE "${_EXE_LINKER_FLAGS_RELEASE}")
@@ -55,7 +55,7 @@ foreach(_flag IN ITEMS
     /OPT:NOREF
     /OPT:NOICF
 )
-    string(APPEND _EXE_LINKER_FLAGS_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
+    STRING(APPEND _EXE_LINKER_FLAGS_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
 endforeach()
 
 set(_EXE_LINKER_FLAGS_CppCommon_CODE_COVERAGE_FALSE_DEBUG "/INCREMENTAL")
