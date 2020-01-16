@@ -27,7 +27,7 @@ foreach(_flag IN ITEMS
     -Wl,-rpath,'\\\$ORIGIN'                 # Look for libs in the same dir
     -Wno-unused-local-typedefs
 )
-    string(APPEND _CXX_FLAGS " ${_flag}")
+    STRING(APPEND _CXX_FLAGS " ${_flag}")
 endforeach()
 
 # Debug
@@ -36,7 +36,7 @@ foreach(_flag IN ITEMS
     -D_DEBUG
     -O0                                     # No optimizations
 )
-    string(APPEND _CXX_FLAGS_DEBUG " ${_flag}")
+    STRING(APPEND _CXX_FLAGS_DEBUG " ${_flag}")
 endforeach()
 
 # Release args
@@ -51,7 +51,7 @@ foreach(_flag IN ITEMS
     -Wl,-z,now                              # Disable lazy binding
     -Wl,-z,relro                            # Read-only segments after relocation
 )
-    string(APPEND _CXX_FLAGS_RELEASE " ${_flag}")
+    STRING(APPEND _CXX_FLAGS_RELEASE " ${_flag}")
 endforeach()
 
 # ReleaseMinSize
@@ -66,7 +66,7 @@ foreach(_flag IN ITEMS
     -Wl,-z,now                              # Disable lazy binding
     -Wl,-z,relro                            # Read-only segments after relocation
 )
-    string(APPEND _CXX_FLAGS_RELEASEMINSIZE " ${_flag}")
+    STRING(APPEND _CXX_FLAGS_RELEASEMINSIZE " ${_flag}")
 endforeach()
 
 # ReleaseNoOpt
@@ -81,13 +81,13 @@ foreach(_flag IN ITEMS
     -Wl,-z,now                              # Disable lazy binding
     -Wl,-z,relro                            # Read-only segments after relocation
 )
-    string(APPEND _CXX_FLAGS_RELEASENOOPT " ${_flag}")
+    STRING(APPEND _CXX_FLAGS_RELEASENOOPT " ${_flag}")
 endforeach()
 
 if("$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x64")
-    string(APPEND _CXX_FLAGS " -m64")
+    STRING(APPEND _CXX_FLAGS " -m64")
 elseif("$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x86")
-    string(APPEND _CXX_FLAGS " -m32")
+    STRING(APPEND _CXX_FLAGS " -m32")
 else()
     message(FATAL_ERROR "'$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}' is not recognized")
 endif()
@@ -107,7 +107,7 @@ foreach(_flag IN ITEMS
     -g                                      # Generate debugging information
     -grecord-gcc-switches                   # Store compiler flags in debugging information
 )
-    string(APPEND _CXX_FLAGS_CppCommon_NO_DEBUG_INFO_FALSE " ${_flag}")
+    STRING(APPEND _CXX_FLAGS_CppCommon_NO_DEBUG_INFO_FALSE " ${_flag}")
 endforeach()
 
 # CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION
@@ -121,5 +121,5 @@ set(_CXX_FLAGS_CppCommon_PREPROCESSOR_OUTPUT_TRUE "-E")
 foreach(_flag IN ITEMS
     --coverage
 )
-    string(APPEND _CXX_FLAGS_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
+    STRING(APPEND _CXX_FLAGS_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
 endforeach()

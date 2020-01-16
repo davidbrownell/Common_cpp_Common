@@ -42,7 +42,7 @@ foreach(_flag IN ITEMS
     /Zc:forScope                            # enforce Standard C++ for scoping rules
     /Zc:wchar_t                             # wchar_t is the native type, not a typedef
 )
-    string(APPEND _CXX_FLAGS " ${_flag}")
+    STRING(APPEND _CXX_FLAGS " ${_flag}")
 endforeach()
 
 # Debug
@@ -53,7 +53,7 @@ foreach(_flag IN ITEMS
     /Od                                     # disable optimizations
     /RTC1                                   # Enable fast checks
 )
-    string(APPEND _CXX_FLAGS_DEBUG " ${_flag}")
+    STRING(APPEND _CXX_FLAGS_DEBUG " ${_flag}")
 endforeach()
 
 # Release
@@ -68,7 +68,7 @@ foreach(_flag IN ITEMS
     /Ot                                     # favor code speed
     /Ox                                     # optimizations (favor speed)
 )
-    string(APPEND _CXX_FLAGS_RELEASE " ${_flag}")
+    STRING(APPEND _CXX_FLAGS_RELEASE " ${_flag}")
 endforeach()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
@@ -76,7 +76,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
         "-Xclang -O3"                       # Advanced optimizations
         "-Xclang -fno-inline"               # Inline optimizations present problems with -O3
     )
-        string(APPEND _CXX_FLAGS_RELEASE " ${_flag}")
+        STRING(APPEND _CXX_FLAGS_RELEASE " ${_flag}")
     endforeach()
 endif()
 
@@ -88,7 +88,7 @@ foreach(_flag IN ITEMS
     /Ob1                                    # inline expansion (default n=0)
     /Os                                     # favor code space
 )
-    string(APPEND _CXX_FLAGS_RELEASEMINSIZE " ${_flag}")
+    STRING(APPEND _CXX_FLAGS_RELEASEMINSIZE " ${_flag}")
 endforeach()
 
 # ReleaseNoOpt
@@ -98,7 +98,7 @@ foreach(_flag IN ITEMS
     /Ob0                                    # inline expansion (default n=0)
     /Od                                     # disable optimizations
 )
-    string(APPEND _CXX_FLAGS_RELEASENOOPT " ${_flag}")
+    STRING(APPEND _CXX_FLAGS_RELEASENOOPT " ${_flag}")
 endforeach()
 
 # ----------------------------------------------------------------------
@@ -123,7 +123,7 @@ set(_CXX_FLAGS_CppCommon_STATIC_CRT_FALSE_RELEASENOOPT "${_CXX_FLAGS_CppCommon_S
 foreach(_flag IN ITEMS
     /Zc:inline                              # remove unreferenced function or data if it is COMDAT or has internal linkage only
 )
-    string(APPEND _CXX_FLAGS_CppCommon_CODE_COVERAGE_FALSE " ${_flag}")
+    STRING(APPEND _CXX_FLAGS_CppCommon_CODE_COVERAGE_FALSE " ${_flag}")
 endforeach()
 
 # CppCommon_NO_DEBUG_INFO

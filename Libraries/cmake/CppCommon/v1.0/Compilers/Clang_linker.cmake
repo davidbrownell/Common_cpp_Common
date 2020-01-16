@@ -19,9 +19,9 @@
 foreach(_flag IN ITEMS
     # No flags at this time
 )
-    string(APPEND _EXE_LINKER_FLAGS_RELEASE " ${_flag}")
-    string(APPEND _EXE_LINKER_FLAGS_RELEASEMINSIZE " ${_flag}")
-    string(APPEND _EXE_LINKER_FLAGS_RELEASENOOPT " ${_flag}")
+    STRING(APPEND _EXE_LINKER_FLAGS_RELEASE " ${_flag}")
+    STRING(APPEND _EXE_LINKER_FLAGS_RELEASEMINSIZE " ${_flag}")
+    STRING(APPEND _EXE_LINKER_FLAGS_RELEASENOOPT " ${_flag}")
 endforeach()
 
 # ----------------------------------------------------------------------
@@ -31,5 +31,5 @@ endforeach()
 foreach(_flag IN ITEMS
     -fprofile-instr-generate                # For use with llvm-cov
 )
-    string(APPEND _EXE_LINKER_FLAGS_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
+    STRING(APPEND _EXE_LINKER_FLAGS_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
 endforeach()
