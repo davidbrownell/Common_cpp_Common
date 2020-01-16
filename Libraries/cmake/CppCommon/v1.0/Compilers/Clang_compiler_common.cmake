@@ -35,13 +35,13 @@ foreach(_flag IN ITEMS
     -Wno-unused-member-function
     -Wno-unused-template
 )
-    string(APPEND _CXX_FLAGS " ${_flag}")
+    STRING(APPEND _CXX_FLAGS " ${_flag}")
 endforeach()
 
 if("$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x64")
-    string(APPEND _CXX_FLAGS " -m64")
+    STRING(APPEND _CXX_FLAGS " -m64")
 elseif("$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}" MATCHES "x86")
-    string(APPEND _CXX_FLAGS " -m32")
+    STRING(APPEND _CXX_FLAGS " -m32")
 else()
     message(FATAL_ERROR "'$ENV{DEVELOPMENT_ENVIRONMENT_CPP_ARCHITECTURE}' is not recognized")
 endif()
@@ -57,5 +57,5 @@ foreach(_flag IN ITEMS
     # TODO  -fprofile-instr-generate                # For use with llvm-cov (generates "default.profraw")
     # TODO  -fcoverage-mapping                      # For use with llvm-cov (generates "default.profraw")
 )
-    string(APPEND _CXX_FLAGS_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
+    STRING(APPEND _CXX_FLAGS_CppCommon_CODE_COVERAGE_TRUE " ${_flag}")
 endforeach()
