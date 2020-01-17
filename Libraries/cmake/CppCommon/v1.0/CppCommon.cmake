@@ -91,6 +91,12 @@ if(NOT CMAKE_CONFIGURATION_TYPES)
         FORCE
     )
 else()
+    # Some generators (like the Visual Studio generators) will specify a number of configuration
+    # types. If we see these configuration types, remap them to supported values.
+    if(CMAKE_CONFIGURATION_TYPES MATCHES "Debug;Release;MinSizeRel;RelWithDebInfo")
+        set(CMAKE_CONFIGURATION_TYPES "Debug;Release;ReleaseMinSize;ReleaseNoOpt")
+    endif()
+
     # Ensure that each `CMAKE_CONFIGURATION_TYPE` is valid
     foreach(_config_type IN ITEMS ${CMAKE_CONFIGURATION_TYPES})
         if(NOT(${_config_type} IN_LIST _valid_configuration_types))
@@ -225,8 +231,8 @@ foreach(_flag_prefix IN ITEMS
     set(_flag_name "_${_flag_prefix}_FLAGS")
 
     if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_flag_name}_UPDATED)
-        string(STRIP "${${_flag_name}}" ${_flag_name})
-        set("${_cmake_flag_name}" "${${_flag_name}}" CACHE string "" FORCE)
+        STRING(STRIP "${${_flag_name}}" ${_flag_name})
+        set("${_cmake_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
     endif()
 
     foreach(_configuration_type IN ITEMS
@@ -239,8 +245,8 @@ foreach(_flag_prefix IN ITEMS
         set(_flag_name "_${_flag_prefix}_FLAGS_${_configuration_type}")
 
         if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_flag_name}_UPDATED)
-            string(STRIP "${${_flag_name}}" ${_flag_name})
-            set("${_cmake_flag_name}" "${${_flag_name}}" CACHE string "" FORCE)
+            STRING(STRIP "${${_flag_name}}" ${_flag_name})
+            set("${_cmake_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
         endif()
     endforeach()
 
@@ -255,8 +261,8 @@ foreach(_flag_prefix IN ITEMS
         set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}")
 
         if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_flag_name})
-            string(STRIP "${${_flag_name}}" ${_flag_name})
-            set("${_flag_name}" "${${_flag_name}}" CACHE string "" FORCE)
+            STRING(STRIP "${${_flag_name}}" ${_flag_name})
+            set("${_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
         endif()
 
         foreach(_boolean_type IN ITEMS
@@ -266,8 +272,8 @@ foreach(_flag_prefix IN ITEMS
             set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}")
 
             if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_flag_name})
-                string(STRIP "${${_flag_name}}" ${_flag_name})
-                set("${_flag_name}" "${${_flag_name}}" CACHE string "" FORCE)
+                STRING(STRIP "${${_flag_name}}" ${_flag_name})
+                set("${_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
             endif()
 
             foreach(_configuration_type IN ITEMS
@@ -279,8 +285,8 @@ foreach(_flag_prefix IN ITEMS
                 set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}_${_configuration_type}")
 
                 if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_flag_name})
-                    string(STRIP "${${_flag_name}}" ${_flag_name})
-                    set("${_flag_name}" "${${_flag_name}}" CACHE string "" FORCE)
+                    STRING(STRIP "${${_flag_name}}" ${_flag_name})
+                    set("${_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
                 endif()
             endforeach()
         endforeach()
@@ -294,8 +300,8 @@ foreach(_flag_prefix IN ITEMS
             set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_configuration_type}")
 
             if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_flag_name})
-                string(STRIP "${${_flag_name}}" ${_flag_name})
-                set("${_flag_name}" "${${_flag_name}}" CACHE string "" FORCE)
+                STRING(STRIP "${${_flag_name}}" ${_flag_name})
+                set("${_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
             endif()
         endforeach()
     endforeach()
@@ -333,8 +339,8 @@ foreach(_flag_prefix IN ITEMS
                 set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}")
 
                 if(NOT "${${_flag_name}}" STREQUAL "")
-                    string(STRIP "${${_flag_name}}" ${_flag_name})
-                    string(APPEND CMAKE_${_flag_prefix}_FLAGS " ${${_flag_name}}")
+                    STRING(STRIP "${${_flag_name}}" ${_flag_name})
+                    STRING(APPEND CMAKE_${_flag_prefix}_FLAGS " ${${_flag_name}}")
                 endif()
 
                 foreach(_config_type IN ITEMS
@@ -346,8 +352,8 @@ foreach(_flag_prefix IN ITEMS
                     set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}_${_config_type}")
 
                     if(NOT "${${_flag_name}}" STREQUAL "")
-                        string(STRIP "${${_flag_name}}" ${_flag_name})
-                        string(APPEND CMAKE_${_flag_prefix}_FLAGS_${_config_type} " ${${_flag_name}}")
+                        STRING(STRIP "${${_flag_name}}" ${_flag_name})
+                        STRING(APPEND CMAKE_${_flag_prefix}_FLAGS_${_config_type} " ${${_flag_name}}")
                     endif()
                 endforeach()
             endif()
@@ -360,7 +366,7 @@ endforeach()
 # |  Inherit default values unless explicitly provided
 # |
 # ----------------------------------------------------------------------
-string(STRIP "${CMAKE_C_FLAGS}" CMAKE_C_FLAGS)
+STRING(STRIP "${CMAKE_C_FLAGS}" CMAKE_C_FLAGS)
 
 if("${CMAKE_C_FLAGS}" STREQUAL "")
     set(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS})
@@ -375,7 +381,7 @@ foreach(_configuration_type IN ITEMS
     set(_dest_flag_name "CMAKE_C_FLAGS_${_configuration_type}")
     set(_source_flag_name "CMAKE_CXX_FLAGS_${_configuration_type}")
 
-    string(STRIP "${${_dest_flag_name}}" ${_dest_flag_name})
+    STRING(STRIP "${${_dest_flag_name}}" ${_dest_flag_name})
 
     if("${${_dest_flag_name}}" STREQUAL "")
         set(${_dest_flag_name} "${${_source_flag_name}}")
@@ -388,7 +394,7 @@ foreach(_flag_prefix IN ITEMS
 )
     set(_dest_flag_name "CMAKE_${_flag_prefix}_FLAGS")
 
-    string(STRIP "${${_dest_flag_name}}" ${_dest_flag_name})
+    STRING(STRIP "${${_dest_flag_name}}" ${_dest_flag_name})
 
     if("${${_dest_flag_name}}" STREQUAL "")
         set(${_dest_flag_name} ${CMAKE_EXE_LINKER_FLAGS})
@@ -403,7 +409,7 @@ foreach(_flag_prefix IN ITEMS
         set(_dest_flag_name "CMAKE_${_flag_prefix}_FLAGS_${_configuration_type}")
         set(_source_flag_name "CMAKE_EXE_LINKER_FLAGS_${_configuration_type}")
 
-        string(STRIP "${${_dest_flag_name}}" ${_dest_flag_name})
+        STRING(STRIP "${${_dest_flag_name}}" ${_dest_flag_name})
 
         if("${${_dest_flag_name}}" STREQUAL "")
             set(${_dest_flag_name} ${${_source_flag_name}})
@@ -422,12 +428,12 @@ endforeach()
 #   - Clang (Linux)
 
 # Grab default flags from the environment
-string(APPEND CMAKE_C_FLAGS " $ENV{CFLAGS}")
-string(APPEND CMAKE_CXX_FLAGS " $ENV{CXXFLAGS}")
-string(APPEND CMAKE_EXE_LINKER_FLAGS " $ENV{LDFLAGS}")
-string(APPEND CMAKE_STATIC_LINKER_FLAGS " $ENV{STATICLIB_LDFLAGS}")
-string(APPEND CMAKE_SHARED_LINKER_FLAGS " $ENV{SHLIB_LDFLAGS}")
-string(APPEND CMAKE_MODULE_LINKER_FLAGS " $ENV{MODULE_LDFLAGS}")
+STRING(APPEND CMAKE_C_FLAGS " $ENV{CFLAGS}")
+STRING(APPEND CMAKE_CXX_FLAGS " $ENV{CXXFLAGS}")
+STRING(APPEND CMAKE_EXE_LINKER_FLAGS " $ENV{LDFLAGS}")
+STRING(APPEND CMAKE_STATIC_LINKER_FLAGS " $ENV{STATICLIB_LDFLAGS}")
+STRING(APPEND CMAKE_SHARED_LINKER_FLAGS " $ENV{SHLIB_LDFLAGS}")
+STRING(APPEND CMAKE_MODULE_LINKER_FLAGS " $ENV{MODULE_LDFLAGS}")
 
 if(${CppCommon_CMAKE_DEBUG_OUTPUT})
     # Output the results

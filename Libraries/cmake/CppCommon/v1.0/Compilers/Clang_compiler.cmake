@@ -23,7 +23,7 @@ foreach(_flag IN ITEMS
     -pipe                                   # Avoid temporary files
     -Wl,-rpath,'\\\$ORIGIN'                 # Look for libs in the same dir
 )
-    string(APPEND _CXX_FLAGS " ${_flag}")
+    STRING(APPEND _CXX_FLAGS " ${_flag}")
 endforeach()
 
 # Debug
@@ -32,7 +32,7 @@ foreach(_flag IN ITEMS
     -D_DEBUG
     -O0                                     # No optimizations
 )
-    string(APPEND _CXX_FLAGS_DEBUG " ${_flag}")
+    STRING(APPEND _CXX_FLAGS_DEBUG " ${_flag}")
 endforeach()
 
 # Release args
@@ -44,7 +44,7 @@ foreach(_flag IN ITEMS
     -fstack-protector-strong                # Stack smashing protection
     -O3                                     # Advanced optimizations
 )
-    string(APPEND _CXX_FLAGS_RELEASE " ${_flag}")
+    STRING(APPEND _CXX_FLAGS_RELEASE " ${_flag}")
 endforeach()
 
 # ReleaseMinSize
@@ -56,7 +56,7 @@ foreach(_flag IN ITEMS
     -fstack-protector-strong                # Stack smashing protection
     -Os                                     # Optimize for small code
 )
-    string(APPEND _CXX_FLAGS_RELEASEMINSIZE " ${_flag}")
+    STRING(APPEND _CXX_FLAGS_RELEASEMINSIZE " ${_flag}")
 endforeach()
 
 # ReleaseNoOpt
@@ -68,7 +68,7 @@ foreach(_flag IN ITEMS
     -fstack-protector-strong                # Stack smashing protection
     -O0                                     # No optimizations
 )
-    string(APPEND _CXX_FLAGS_RELEASENOOPT " ${_flag}")
+    STRING(APPEND _CXX_FLAGS_RELEASENOOPT " ${_flag}")
 endforeach()
 
 if(APPLE)
@@ -84,7 +84,7 @@ else()
             -Wl,-z,now                      # Disable lazy binding
             -Wl,-z,relro                    # Read-only segments after relocation
         )
-            string(APPEND ${_dest_flag} " ${_flag}")
+            STRING(APPEND ${_dest_flag} " ${_flag}")
         endforeach()
     endforeach()
 endif()
@@ -104,7 +104,7 @@ foreach(_flag IN ITEMS
     -g                                      # Generate debugging information
     -grecord-gcc-switches                   # Store compiler flags in debugging information
 )
-    string(APPEND _CXX_FLAGS_CppCommon_NO_DEBUG_INFO_FALSE " ${_flag}")
+    STRING(APPEND _CXX_FLAGS_CppCommon_NO_DEBUG_INFO_FALSE " ${_flag}")
 endforeach()
 
 # CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION
