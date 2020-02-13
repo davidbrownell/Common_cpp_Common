@@ -143,7 +143,10 @@ class Compiler(
             ("is_debug", True),
             ("cmake_debug_output", False),
             ("use_unicode", False),
-            ("static_crt", True),
+            (
+                "static_crt",
+                False if os.getenv("DEVELOPMENT_ENVIRONMENT_CPP_NO_STATIC_CRT") else True,
+            ),
             ("is_profile", False),
             ("is_benchmark", False),
             ("disable_debug_info", False),
