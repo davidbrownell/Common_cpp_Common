@@ -417,15 +417,11 @@ foreach(_flag_prefix IN ITEMS
     endforeach()
 endforeach()
 
-
-# TODO: Verify Static Linker flags (GCC)
-# TODO: Verify Shared Linker flags (GCC)
-# TODO: Verify Module Linker flags (GCC)
-
 # Flags have been verified for:
 #   - MSVC
 #   - Clang (Windows using MSVC)
 #   - Clang (Linux)
+#   - GCC (Linux)
 
 # Grab default flags from the environment
 STRING(APPEND CMAKE_C_FLAGS " $ENV{CFLAGS}")

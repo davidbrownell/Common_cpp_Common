@@ -16,16 +16,17 @@ cmake_minimum_required(VERSION 3.5.0)
 # If this template is being used as a module/.cmake file (rather than in CMakeLists.txt),
 # do the following:
 #
-#   1) Change the `macro` below to a `function`
-#   2) Instead of using the `_this_path` variable, uncomment the file-scoped var
-#      and use that value everywhere that `_this_path` is used below.
+#   1) Change the `macro` below to `function`
+#   2) Change the `endmacro` below to `endfunction`
+#   3) Instead of using the `_this_path` variable, uncomment the file-scoped var below
+#   4) Replace all instances of `_this_path` with the name of the variable created in step 3
 
 # Uncomment the following line if this is a module:
 #
 # set(_<module_name>_this_path ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
 
 macro(Impl)
-    # Defining a function here to introduce a new scope for local variables
+    # Defining a macro / function here to introduce a new scope for local variables
     set(_project_name <project_name>)
     set(_version_major <project_version_major>)         # '1' in the release 1.2.3-alpha1+201910161322
     set(_version_minor <project_version_minor>)         # '2' in the release 1.2.3-alpha1+201910161322
@@ -96,12 +97,12 @@ macro(Impl)
     )
 
     target_link_directories(
-        ${_project_name} PRIVATE
+        ${_project_name} PUBLIC
         ${_libs}
     )
 
     # target_link_libraries(
-    #     ${_project_name} PRIVATE
+    #     ${_project_name} PUBLIC
     #     <library_names>
     # )
 
@@ -133,7 +134,7 @@ macro(Impl)
         # Run all tests with verbose output except those tagged with "[benchmark]"
         add_test(NAME ${_test_name} COMMAND ${_test_name} ~[benchmark] --success)
 
-        # If not in release mode, run tests tagged with "[benchmark]". Note that we
+        # If not in debug mode, run tests tagged with "[benchmark]". Note that we
         # don't want to run with verbose output in this scenario, as that output will
         # prevent accurate benchmark statistics.
         if(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
