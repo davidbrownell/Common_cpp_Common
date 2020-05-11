@@ -26,6 +26,7 @@ foreach(_flag IN ITEMS
     -Wno-c++98-compat-pedantic
     -Wno-disabled-macro-expansion
     -Wno-extra-semi
+    -Wno-extra-semi-stmt
     -Wno-global-constructors
     -Wno-gnu-zero-variadic-macro-arguments
     -Wno-invalid-token-paste
