@@ -12,6 +12,15 @@ endif()
 include(BuildHelpers)
 
 function(Impl)
+    # Set compiler options here
+    #
+    # set(CppCommon_STATIC_CRT ON CACHE BOOL "" FORCE)
+    # set(CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION ON CACHE BOOL "" FORCE)
+
+    # Include cmake modules here
+    #
+    # include(FooModule)
+
     get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 
     MESSAGE(FATAL_ERROR "Add 'build_binary', 'build_library', or 'build_tests' on the next line")
