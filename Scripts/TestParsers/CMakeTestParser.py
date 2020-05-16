@@ -90,7 +90,7 @@ class TestParser(TestParserImpl):
 
         return 'cd "{output_dir}" && ctest --verbose{parallel}'.format(
             output_dir=context["output_dir"],
-            parallel=" --parallel" if is_profile_or_benchmark else "",
+            parallel="" if is_profile_or_benchmark else " --parallel",
         )
 
     # ----------------------------------------------------------------------
