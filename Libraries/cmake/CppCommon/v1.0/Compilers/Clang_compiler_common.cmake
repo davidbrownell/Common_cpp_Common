@@ -20,6 +20,7 @@
 # ----------------------------------------------------------------------
 # |  Static Flags
 foreach(_flag IN ITEMS
+    -fdiagnostics-absolute-paths
     -fmacro-backtrace-limit=0
     -W
     -Wall
