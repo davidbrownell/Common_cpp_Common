@@ -163,6 +163,7 @@ function(build_binary)
         PROPERTIES
         VERSION ${BUILD_VERISON_MAJOR}.${BUILD_VERSION_MINOR}.${BUILD_VERSION_PATCH}
         SOVERSION ${BUILD_VERSION_MAJOR}
+        LINKER_LANGUAGE CXX
     )
 
     foreach(_include_item IN ITEMS
@@ -255,6 +256,8 @@ function(build_library)
     endif()
 
     if(${BUILD_IS_INTERFACE})
+        set(_visibility INTERFACE)
+
         add_library(
             ${BUILD_NAME}
             INTERFACE
@@ -265,6 +268,8 @@ function(build_library)
             ${BUILD_FILES}
         )
     else()
+        set(_visibility PUBLIC)
+
         add_library(
             ${BUILD_NAME}
             ${BUILD_FILES}
@@ -290,12 +295,6 @@ function(build_library)
                 ${_libs}
             )
         endif()
-    endif()
-
-    if(${BUILD_IS_INTERFACE})
-        set(_visibility INTERFACE)
-    else()
-        set(_visibility PUBLIC)
     endif()
 
     if(NOT "${BUILD_PUBLIC_INCLUDE_DIRECTORIES}" STREQUAL "")

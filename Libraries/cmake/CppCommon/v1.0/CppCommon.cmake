@@ -158,6 +158,8 @@ foreach(_flag_prefix IN ITEMS
         CppCommon_NO_ADDRESS_SPACE_LAYOUT_RANDOMIZATION
         CppCommon_PREPROCESSOR_OUTPUT
     )
+        set("_${_flag_prefix}_FLAGS_${_flag_type}" "")
+
         foreach(_boolean_type IN ITEMS
             TRUE
             FALSE
@@ -230,9 +232,12 @@ foreach(_flag_prefix IN ITEMS
     set(_cmake_flag_name "CMAKE_${_flag_prefix}_FLAGS")
     set(_flag_name "_${_flag_prefix}_FLAGS")
 
-    if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_flag_name}_UPDATED)
+    if(True) # TODO ${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _UPDATED_${_flag_name})
         STRING(STRIP "${${_flag_name}}" ${_flag_name})
         set("${_cmake_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
+
+        # MESSAGE("TODO1")
+        # TODO set(_UPDATED_${_flag_name} "" CACHE STRING "" FORCE)
     endif()
 
     foreach(_configuration_type IN ITEMS
@@ -244,9 +249,12 @@ foreach(_flag_prefix IN ITEMS
         set(_cmake_flag_name "CMAKE_${_flag_prefix}_FLAGS_${_configuration_type}")
         set(_flag_name "_${_flag_prefix}_FLAGS_${_configuration_type}")
 
-        if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_flag_name}_UPDATED)
+        if(True) # TODO ${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _UPDATED_${_flag_name})
             STRING(STRIP "${${_flag_name}}" ${_flag_name})
             set("${_cmake_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
+
+            # MESSAGE("TODO2")
+            # TODO set(_UPDATED_${_flag_name} "" CACHE STRING "" FORCE)
         endif()
     endforeach()
 
@@ -260,9 +268,12 @@ foreach(_flag_prefix IN ITEMS
     )
         set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}")
 
-        if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_flag_name})
+        if(True) # TODO ${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _UPDATED_${_flag_name})
             STRING(STRIP "${${_flag_name}}" ${_flag_name})
             set("${_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
+
+            # MESSAGE("TODO3")
+            # TODO set(_UPDATED_${_flag_name} "" CACHE STRING "" FORCE)
         endif()
 
         foreach(_boolean_type IN ITEMS
@@ -271,9 +282,12 @@ foreach(_flag_prefix IN ITEMS
         )
             set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}")
 
-            if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_flag_name})
+            if(True) # TODO ${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _UPDATED_${_flag_name})
                 STRING(STRIP "${${_flag_name}}" ${_flag_name})
                 set("${_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
+
+                # MESSAGE("TODO4")
+                # TODO set(_UPDATED_${_flag_name} "" CACHE STRING "" FORCE)
             endif()
 
             foreach(_configuration_type IN ITEMS
@@ -284,9 +298,12 @@ foreach(_flag_prefix IN ITEMS
             )
                 set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}_${_configuration_type}")
 
-                if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_flag_name})
+                if(True) # TODO ${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _UPDATED_${_flag_name})
                     STRING(STRIP "${${_flag_name}}" ${_flag_name})
                     set("${_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
+
+                    # MESSAGE("TODO5")
+                    # TODO set(_UPDATED_${_flag_name} "" CACHE STRING "" FORCE)
                 endif()
             endforeach()
         endforeach()
@@ -299,9 +316,12 @@ foreach(_flag_prefix IN ITEMS
         )
             set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_configuration_type}")
 
-            if(${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED ${_flag_name})
+            if(True) # TODO ${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _UPDATED_${_flag_name})
                 STRING(STRIP "${${_flag_name}}" ${_flag_name})
                 set("${_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
+
+                # MESSAGE("TODO6")
+                # TODO set(_UPDATED_${_flag_name} "" CACHE STRING "" FORCE)
             endif()
         endforeach()
     endforeach()
