@@ -24,6 +24,7 @@ foreach(_flag IN ITEMS
     -fmacro-backtrace-limit=0
     -W
     -Wall
+    -Werror
     -Wno-c++98-compat-pedantic
     -Wno-disabled-macro-expansion
     -Wno-extra-semi
@@ -33,6 +34,7 @@ foreach(_flag IN ITEMS
     -Wno-invalid-token-paste
     -Wno-missing-prototypes
     -Wno-reserved-id-macro
+    -Wno-undefined-inline
     -Wno-unused-command-line-argument
     -Wno-unused-member-function
     -Wno-unused-template
