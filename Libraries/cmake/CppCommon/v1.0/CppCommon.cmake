@@ -20,12 +20,6 @@ cmake_policy(SET CMP0057 NEW)               # Support IN_LIST
 cmake_policy(SET CMP0066 NEW)               # Honor compile flags
 
 option(
-    CppCommon_CMAKE_FORCE_FLAG_GENERATION
-    "Force the repopulation of CMAKE flags, overwriting any changes made after a previous generation."
-    OFF
-)
-
-option(
     CppCommon_CMAKE_DEBUG_OUTPUT
     "Generates cmake debug output"
     OFF
@@ -232,13 +226,8 @@ foreach(_flag_prefix IN ITEMS
     set(_cmake_flag_name "CMAKE_${_flag_prefix}_FLAGS")
     set(_flag_name "_${_flag_prefix}_FLAGS")
 
-    if(True) # TODO ${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _UPDATED_${_flag_name})
-        STRING(STRIP "${${_flag_name}}" ${_flag_name})
-        set("${_cmake_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
-
-        # MESSAGE("TODO1")
-        # TODO set(_UPDATED_${_flag_name} "" CACHE STRING "" FORCE)
-    endif()
+    STRING(STRIP "${${_flag_name}}" ${_flag_name})
+    set("${_cmake_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
 
     foreach(_configuration_type IN ITEMS
         DEBUG
@@ -249,13 +238,8 @@ foreach(_flag_prefix IN ITEMS
         set(_cmake_flag_name "CMAKE_${_flag_prefix}_FLAGS_${_configuration_type}")
         set(_flag_name "_${_flag_prefix}_FLAGS_${_configuration_type}")
 
-        if(True) # TODO ${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _UPDATED_${_flag_name})
-            STRING(STRIP "${${_flag_name}}" ${_flag_name})
-            set("${_cmake_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
-
-            # MESSAGE("TODO2")
-            # TODO set(_UPDATED_${_flag_name} "" CACHE STRING "" FORCE)
-        endif()
+        STRING(STRIP "${${_flag_name}}" ${_flag_name})
+        set("${_cmake_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
     endforeach()
 
     foreach(_flag_type IN ITEMS
@@ -268,13 +252,8 @@ foreach(_flag_prefix IN ITEMS
     )
         set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}")
 
-        if(True) # TODO ${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _UPDATED_${_flag_name})
-            STRING(STRIP "${${_flag_name}}" ${_flag_name})
-            set("${_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
-
-            # MESSAGE("TODO3")
-            # TODO set(_UPDATED_${_flag_name} "" CACHE STRING "" FORCE)
-        endif()
+        STRING(STRIP "${${_flag_name}}" ${_flag_name})
+        set("${_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
 
         foreach(_boolean_type IN ITEMS
             TRUE
@@ -282,13 +261,8 @@ foreach(_flag_prefix IN ITEMS
         )
             set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}")
 
-            if(True) # TODO ${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _UPDATED_${_flag_name})
-                STRING(STRIP "${${_flag_name}}" ${_flag_name})
-                set("${_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
-
-                # MESSAGE("TODO4")
-                # TODO set(_UPDATED_${_flag_name} "" CACHE STRING "" FORCE)
-            endif()
+            STRING(STRIP "${${_flag_name}}" ${_flag_name})
+            set("${_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
 
             foreach(_configuration_type IN ITEMS
                 DEBUG
@@ -298,13 +272,8 @@ foreach(_flag_prefix IN ITEMS
             )
                 set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_boolean_type}_${_configuration_type}")
 
-                if(True) # TODO ${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _UPDATED_${_flag_name})
-                    STRING(STRIP "${${_flag_name}}" ${_flag_name})
-                    set("${_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
-
-                    # MESSAGE("TODO5")
-                    # TODO set(_UPDATED_${_flag_name} "" CACHE STRING "" FORCE)
-                endif()
+                STRING(STRIP "${${_flag_name}}" ${_flag_name})
+                set("${_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
             endforeach()
         endforeach()
 
@@ -316,13 +285,8 @@ foreach(_flag_prefix IN ITEMS
         )
             set(_flag_name "_${_flag_prefix}_FLAGS_${_flag_type}_${_configuration_type}")
 
-            if(True) # TODO ${CppCommon_CMAKE_FORCE_FLAG_GENERATION} OR NOT DEFINED _UPDATED_${_flag_name})
-                STRING(STRIP "${${_flag_name}}" ${_flag_name})
-                set("${_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
-
-                # MESSAGE("TODO6")
-                # TODO set(_UPDATED_${_flag_name} "" CACHE STRING "" FORCE)
-            endif()
+            STRING(STRIP "${${_flag_name}}" ${_flag_name})
+            set("${_flag_name}" "${${_flag_name}}" CACHE STRING "" FORCE)
         endforeach()
     endforeach()
 endforeach()
