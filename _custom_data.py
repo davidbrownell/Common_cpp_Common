@@ -91,7 +91,7 @@ _CUSTOM_DATA                                = [
                 [
                     (
                         "Windows",
-                        "4594f25878ec07bc25795ba27def1f83d8f3d2b5ff62335a0f1a25154407384d",
+                        "ec6dc814641051276c461f4a4574a7447806641933f5cd9e33d99b06d449471a",
                     ),
                     (
                         "Linux",
