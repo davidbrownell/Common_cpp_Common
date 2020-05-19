@@ -23,8 +23,8 @@ foreach(_flag IN ITEMS
     -fdiagnostics-absolute-paths
     -fmacro-backtrace-limit=0
     -W
-    -Wall
-    -Werror
+    -Wall                                   # All warnings
+    -Werror                                 # Treat warnings as errors
     -Wno-c++98-compat-pedantic
     -Wno-disabled-macro-expansion
     -Wno-extra-semi
