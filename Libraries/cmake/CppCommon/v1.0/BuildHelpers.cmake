@@ -140,6 +140,11 @@ function(build_binary)
     set(_includes "$ENV{INCLUDE}")
     set(_libs "$ENV{LIB}")
 
+    _MakeRelativePaths(BUILD_INCLUDE_DIRECTORIES)
+    _MakeRelativePaths(_includes)
+    _MakeRelativePaths(BUILD_LINK_DIRECTORIES)
+    _MakeRelativePaths(_libs)
+
     if(NOT WIN32)
         string(REPLACE ":" ";" _includes "${_includes}")
         string(REPLACE ":" ";" _libs "${_libs}")
@@ -163,6 +168,7 @@ function(build_binary)
         PROPERTIES
         VERSION ${BUILD_VERISON_MAJOR}.${BUILD_VERSION_MINOR}.${BUILD_VERSION_PATCH}
         SOVERSION ${BUILD_VERSION_MAJOR}
+        LINKER_LANGUAGE CXX
     )
 
     foreach(_include_item IN ITEMS
@@ -254,7 +260,15 @@ function(build_library)
         string(REPLACE ":" ";" _libs "${_libs}")
     endif()
 
+    _MakeRelativePaths(BUILD_INCLUDE_DIRECTORIES)
+    _MakeRelativePaths(BUILD_PUBLIC_INCLUDE_DIRECTORIES)
+    _MakeRelativePaths(_includes)
+    _MakeRelativePaths(BUILD_PUBLIC_LINK_DIRECTORIES)
+    _MakeRelativePaths(_libs)
+
     if(${BUILD_IS_INTERFACE})
+        set(_visibility INTERFACE)
+
         add_library(
             ${BUILD_NAME}
             INTERFACE
@@ -265,6 +279,8 @@ function(build_library)
             ${BUILD_FILES}
         )
     else()
+        set(_visibility PUBLIC)
+
         add_library(
             ${BUILD_NAME}
             ${BUILD_FILES}
@@ -290,12 +306,6 @@ function(build_library)
                 ${_libs}
             )
         endif()
-    endif()
-
-    if(${BUILD_IS_INTERFACE})
-        set(_visibility INTERFACE)
-    else()
-        set(_visibility PUBLIC)
     endif()
 
     if(NOT "${BUILD_PUBLIC_INCLUDE_DIRECTORIES}" STREQUAL "")
@@ -376,6 +386,11 @@ function(build_tests)
         string(REPLACE ":" ";" _libs "${_libs}")
     endif()
 
+    _MakeRelativePaths(BUILD_INCLUDE_DIRECTORIES)
+    _MakeRelativePaths(_includes)
+    _MakeRelativePaths(BUILD_LINK_DIRECTORIES)
+    _MakeRelativePaths(_libs)
+
     foreach(_test_file IN ITEMS ${BUILD_FILES})
         get_filename_component(_test_name ${_test_file} NAME_WE)
 
@@ -450,4 +465,31 @@ macro(_ValidateRequiredParams)
             MESSAGE(FATAL_ERROR "'${_incoming_name}' is a required argument")
         endif()
     endforeach()
+endmacro()
+
+# ----------------------------------------------------------------------
+macro(_MakeRelativePaths var_name)
+    if((CMAKE_CXX_COMPILER_ID MATCHES MSVC OR (CMAKE_CXX_COMPILER_ID MATCHES Clang AND _compiler_basename MATCHES "clang-cl.exe")) AND "${CMAKE_GENERATOR}" STREQUAL "Ninja")
+        # When compiling with MSVC, Ninja will use the '/showIncludes' command line argument to
+        # calculate header file dependencies. The dependencies produced by '/showIncludes' must
+        # perfectly match the dependencies detected by include directives to be considered a
+        # match. To ensure consistency, convert the include directives to relative paths so
+        # that they match the relative paths in the output of '/showIncludes'.
+
+        if(False)
+            # Unfortunately, this technique often produces paths that are too long on windows,
+            # resulting in Ninja errors. Through experimentation, it turns out that it is a better
+            # solution to embed a manifest into the ninja executable to support long path names
+            # on Windows.
+
+            set(_new_items "")
+
+            foreach(_item IN ITEMS ${${var_name}})
+                file(RELATIVE_PATH _new_item ${CMAKE_SOURCE_DIR} ${_item})
+                list(APPEND _new_items ${_new_item})
+            endforeach()
+
+            set(${var_name} ${_new_items})
+        endif()
+    endif()
 endmacro()
