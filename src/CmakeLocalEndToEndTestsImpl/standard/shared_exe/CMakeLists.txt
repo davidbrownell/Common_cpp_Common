@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 3.5.0)
 
 macro(Impl)
-    set(_project_name Exe)
-    set(_version_major 1)
-    set(_version_minor 2)
-    set(_version_patch 3)
-    set(_version_prerelease_info "")
-    set(_version_build_info "")
+    # Defining a function here to introduce a new scope for local variables
+    set(_project_name SharedExe)
+    set(_version_major 3)                   # '1' in the release 1.2.3-alpha1+201910161322
+    set(_version_minor 2)                   # '2' in the release 1.2.3-alpha1+201910161322
+    set(_version_patch 1)                   # '3' in the release 1.2.3-alpha1+201910161322
+    set(_version_prerelease_info "")        # Optional 'alpha1' in the release 1.2.3-alpha1+201910161322
+    set(_version_build_info "")             # Optional '201910161322' in the release 1.2.3-alpha1+201910161322
 
     set(_version ${_version_major}.${_version_minor}.${_version_patch})
 
@@ -34,7 +35,7 @@ macro(Impl)
     include(GenerateFileAttributes)
 
     generate_file_attributes(
-        _exe_file_attribute_sources
+        _shared_exe_file_attribute_sources
         NAME ${_project_name}
         COMPANY_NAME MyCompany
         VERSION_MAJOR ${_version_major}
@@ -44,26 +45,21 @@ macro(Impl)
         VERSION_BUILD_INFO ${_version_build_info}
     )
 
-    # All paths should be relative to `${_this_path}`.
+    # Do not use `_this_path` if this is a module.
     get_filename_component(_this_path ${CMAKE_CURRENT_LIST_FILE} DIRECTORY)
 
-    include(${_this_path}/../lib/lib.cmake)
+    include(${_this_path}/../shared/shared.cmake)
 
     add_executable(
         ${_project_name}
-        exe.cpp
-        ${_exe_file_attribute_sources}
+        ../../shared_exe.cpp
+        ${_shared_exe_file_attribute_sources}
     )
 
     set_target_properties(
         ${_project_name} PROPERTIES
         VERSION ${_version}
         SOVERSION ${_version_major}
-    )
-
-    target_link_libraries(
-        ${_project_name}
-        Lib
     )
 
     target_include_directories(
@@ -74,6 +70,11 @@ macro(Impl)
     target_link_directories(
         ${_project_name} PRIVATE
         ${_libs}
+    )
+
+    target_link_libraries(
+        ${_project_name} PRIVATE
+        Shared
     )
 endmacro()
 

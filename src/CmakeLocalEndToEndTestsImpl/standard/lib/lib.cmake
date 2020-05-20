@@ -30,7 +30,7 @@ function(Impl)
     add_library(
         ${_project_name}
         STATIC
-        ${_this_path}/lib.cpp
+        ${_this_path}/../../lib.cpp
     )
 
     set_target_properties(
