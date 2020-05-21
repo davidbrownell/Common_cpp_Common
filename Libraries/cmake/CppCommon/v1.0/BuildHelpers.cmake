@@ -106,7 +106,7 @@ function(build_binary)
         if(NOT "${BUILD_COMPANY_NAME}" STREQUAL "")
             generate_file_attributes(
                 _file_attribute_filenames
-                NAME "${NAME}"
+                NAME "${BUILD_NAME}"
                 COMPANY_NAME "${BUILD_COMPANY_NAME}"
                 VERSION_MAJOR "${BUILD_VERSION_MAJOR}"
                 VERSION_MINOR "${BUILD_VERSION_MINOR}"

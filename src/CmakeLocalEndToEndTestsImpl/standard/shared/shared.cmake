@@ -52,8 +52,8 @@ function(Impl)
     add_library(
         ${_project_name}
         SHARED
-        ${_shared_this_path}/shared.cpp
-        ${_shared_this_path}/shared.h
+        ${_shared_this_path}/../../shared.cpp
+        ${_shared_this_path}/../../shared.h
         ${_shared_file_attribute_sources}
     )
 
