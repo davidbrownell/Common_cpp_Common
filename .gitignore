@@ -27,6 +27,9 @@ coverage.xml
 Tools/cmake/v3.13.4/BSD/*
 Tools/cmake/v3.13.4/Linux/*
 Tools/cmake/v3.13.4/Windows/*
+Tools/cmake/v3.17.2/BSD/*
+Tools/cmake/v3.17.2/Linux/*
+Tools/cmake/v3.17.2/Windows/*
 
 Tools/Doxygen/v1.8.16/Linux/*
 Tools/Doxygen/v1.8.16/Windows/*
