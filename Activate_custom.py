@@ -16,6 +16,7 @@
 
 import os
 import sys
+import textwrap
 
 from collections import OrderedDict
 
@@ -187,6 +188,40 @@ def GetCustomActions(
             ["c++-compiler-CMake", "c++-test_parser-CMake"],
         ),
     )
+
+    # Warn for long paths
+    if CurrentShell.CategoryName == "Windows":
+        # Compilers on Windows may have problems with long paths. Set a warning if the root is
+        # long.
+        max_path_length = 60
+
+        generated_index = generated_dir.find("Generated")
+        assert generated_index != -1, generated_dir
+
+        this_generated_dir = CommonEnvironment.FileSystem.RemoveTrailingSep(generated_dir[:generated_index])
+        if len(this_generated_dir) > max_path_length:
+            actions.append(
+                CurrentShell.Commands.Message(
+                    textwrap.dedent(
+                        """\
+
+
+                        WARNING: The root directory for this repository is long, which may cause problems
+                                 for some compilers. If you experience abnormal compiler errors, create a
+                                 temporary shortcut to this root directory and test again from that shortcut.
+
+                                 Current Directory:         {} [{} characters]
+                                 Max Recommended Length:    {}
+
+
+                        """,
+                    ).format(
+                        this_generated_dir,
+                        len(this_generated_dir),
+                        max_path_length,
+                    ),
+                )
+            )
 
     return actions
 
