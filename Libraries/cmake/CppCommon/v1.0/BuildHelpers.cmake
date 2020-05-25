@@ -58,6 +58,8 @@ function(build_binary)
         INCLUDE_DIRECTORIES         # None                          Include directories
         LINK_LIBRARIES              # None                          Libraries to link
         LINK_DIRECTORIES            # None                          Link include directories
+        PRECOMPILED_HEADERS         # None                          Precompiled header names
+        PRECOMPILED_LIBRARY_HEADERS # None                          Library names that include precompiled headers
     )
 
     cmake_parse_arguments(
@@ -204,6 +206,8 @@ function(build_binary)
             ${BUILD_LINK_LIBRARIES}
         )
     endif()
+
+    _ApplyPrecompiledHeaders(${BUILD_NAME} PUBLIC)
 endfunction()
 
 # ----------------------------------------------------------------------
@@ -226,6 +230,7 @@ function(build_library)
         PUBLIC_INCLUDE_DIRECTORIES      # None                          Public Include directories
         PUBLIC_LINK_LIBRARIES           # None                          Libraries to link
         PUBLIC_LINK_DIRECTORIES         # None                          Link include directories
+        PRECOMPILED_HEADERS             # None                          Precompiled header names
     )
 
     cmake_parse_arguments(
@@ -316,6 +321,14 @@ function(build_library)
         )
     endif()
 
+    if(NOT "${BUILD_PUBLIC_LINK_LIBRARIES}" STREQUAL "")
+        target_link_libraries(
+            ${BUILD_NAME}
+            ${_visibility}
+            ${BUILD_PUBLIC_LINK_LIBRARIES}
+        )
+    endif()
+
     if(NOT "${BUILD_PUBLIC_LINK_DIRECTORIES}" STREQUAL "")
         target_link_directories(
             ${BUILD_NAME}
@@ -324,13 +337,7 @@ function(build_library)
         )
     endif()
 
-    if(NOT "${BUILD_PUBLIC_LINK_LIBRARIES}" STREQUAL "")
-        target_link_libraries(
-            ${BUILD_NAME}
-            ${_visibility}
-            ${BUILD_PUBLIC_LINK_LIBRARIES}
-        )
-    endif()
+    _ApplyPrecompiledHeaders(${BUILD_NAME} ${_visibility})
 endfunction()
 
 # ----------------------------------------------------------------------
@@ -353,6 +360,8 @@ function(build_tests)
         INCLUDE_DIRECTORIES         # None                          Include directories
         LINK_LIBRARIES              # None                          Libraries to link
         LINK_DIRECTORIES            # None                          Link include directories
+        PRECOMPILED_HEADERS         # None                          Precompiled header names
+        PRECOMPILED_LIBRARY_HEADERS # None                          Library names that include precompiled headers
     )
 
     cmake_parse_arguments(
@@ -403,7 +412,7 @@ function(build_tests)
             if(NOT "${${_include_item}}" STREQUAL "")
                 target_include_directories(
                     ${_test_name}
-                    PUBLIC
+                    PRIVATE
                     ${${_include_item}}
                 )
             endif()
@@ -416,7 +425,7 @@ function(build_tests)
             if(NOT "${${_lib_item}}" STREQUAL "")
                 target_link_directories(
                     ${_test_name}
-                    PUBLIC
+                    PRIVATE
                     ${${_lib_item}}
                 )
             endif()
@@ -425,10 +434,12 @@ function(build_tests)
         if(NOT "${BUILD_LINK_LIBRARIES}" STREQUAL "")
             target_link_libraries(
                 ${_test_name}
-                PUBLIC
+                PRIVATE
                 ${BUILD_LINK_LIBRARIES}
             )
         endif()
+
+        _ApplyPrecompiledHeaders(${_test_name} PRIVATE)
 
         # Run all tests with verbose output except those tagged with "[benchmark]"
         add_test(
@@ -491,5 +502,35 @@ macro(_MakeRelativePaths var_name)
 
             set(${var_name} ${_new_items})
         endif()
+    endif()
+endmacro()
+
+# ----------------------------------------------------------------------
+macro(_ApplyPrecompiledHeaders target_name visibility)
+    if(NOT "${BUILD_PRECOMPILED_HEADERS}" STREQUAL "")
+        _VerifyCmakeVersion(3.16 "Precompiled headers functionality")
+
+        target_precompile_headers(
+            ${target_name}
+            ${visibility}
+            ${BUILD_PRECOMPILED_HEADERS}
+        )
+    endif()
+
+    if(NOT "${BUILD_PRECOMPILED_LIBRARY_HEADERS}" STREQUAL "")
+        _VerifyCmakeVersion(3.16 "Precompiled headers functionality")
+
+        target_precompile_headers(
+            ${target_name}
+            REUSE_FROM
+            ${BUILD_PRECOMPILED_LIBRARY_HEADERS}
+        )
+    endif()
+endmacro()
+
+# ----------------------------------------------------------------------
+macro(_VerifyCmakeVersion version desc)
+    if(${CMAKE_VERSION} VERSION_LESS ${version})
+        message(FATAL_ERROR "${desc} requires cmake version '${version}'; cmake version '${CMAKE_VERSION}' found.")
     endif()
 endmacro()
