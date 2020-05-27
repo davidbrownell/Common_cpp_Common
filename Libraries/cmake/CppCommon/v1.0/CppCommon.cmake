@@ -61,6 +61,10 @@ option(
     OFF
 )
 
+if("$ENV{DEVELOPMENT_ENVIRONMENT_CPP_CMAKE_DISABLE_PRECOMPILE_HEADERS}" STREQUAL "1")
+    set(CMAKE_DISABLE_PRECOMPILE_HEADERS ON)
+endif()
+
 # CMAKE_CONFIGURATION_TYPES
 set(_valid_configuration_types
     Debug                                   # Standard Debug build
