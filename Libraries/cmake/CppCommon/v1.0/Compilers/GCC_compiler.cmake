@@ -21,6 +21,7 @@ foreach(_flag IN ITEMS
     -fexceptions                            # Enable table-based thread cancellation
     -fvisibility=hidden                     # Symbols in shared libraries are hidden by default (which is consistent with Windows)
     -pipe                                   # Avoid temporary files
+    -pthread                                # Thread functionality
     -W
     -Wall                                   # All warnings
     -Werror                                 # Treat warnings as errors
