@@ -34,6 +34,7 @@ foreach(_flag IN ITEMS
     -Wno-invalid-token-paste
     -Wno-missing-prototypes
     -Wno-reserved-id-macro
+    -Wno-string-conversion
     -Wno-undefined-inline
     -Wno-unused-command-line-argument
     -Wno-unused-member-function
