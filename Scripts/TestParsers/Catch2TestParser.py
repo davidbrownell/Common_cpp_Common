@@ -168,7 +168,7 @@ def ExtractBenchmarkOutput(output):
             for stats in _ExtractBenchmarkOutput_stats_regex.finditer(match[None]):
                 these_benchmarks.append(
                     TestParserImpl.BenchmarkStat(
-                        stats.group("name"),
+                        "{} - {}".format(match["test_name"], stats.group("name")),
                         match["test_filename"],
                         int(match["test_line"]),
                         catch_version,
