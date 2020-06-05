@@ -104,6 +104,8 @@ _ExtractBenchmarkOutput_content_regex       = re.compile(
     re.DOTALL | re.MULTILINE,
 )
 
+# Note that the representation of line numbers is different on Linux
+# and Windows.
 _ExtractBenchmarkOutput_benchmarks_regex    = re.compile(
     textwrap.dedent(
         r"""(?#
@@ -111,7 +113,11 @@ _ExtractBenchmarkOutput_benchmarks_regex    = re.compile(
         Test Name       )(?P<test_name>[^\r\n]+)\r?\n(?#
         Header 2        )-+\r?\n(?#
         Test Filename   )(?P<test_filename>[^\r\n]+)(?#
-        Test line       )\((?P<test_line>\d+)\)\r?\n(?#
+        Test line       )(?:(?#
+            Windows     )\((?P<test_line_windows>\d+)\)(?#
+                        )|(?#
+            Linux       ):(?P<test_line_linux>\d+)(?#
+                        ))\r?\n(?#
         Header 3        )\.+\r?\n(?#
         Benchmark hdr   )\s+benchmark name\s+samples.+?(?#
         Header 4        )-+\r?\n(?#
@@ -165,12 +171,18 @@ def ExtractBenchmarkOutput(output):
                 assert None in match, match
                 continue
 
+            test_line = match["test_line_windows"]
+            if test_line is None:
+                test_line = match["test_line_linux"]
+                if test_line is None:
+                    assert False
+
             for stats in _ExtractBenchmarkOutput_stats_regex.finditer(match[None]):
                 these_benchmarks.append(
                     TestParserImpl.BenchmarkStat(
                         "{} - {}".format(match["test_name"], stats.group("name")),
                         match["test_filename"],
-                        int(match["test_line"]),
+                        int(test_line),
                         catch_version,
                         TestParserImpl.BenchmarkStat.ConvertTime(
                             float(stats.group("low_mean")),
