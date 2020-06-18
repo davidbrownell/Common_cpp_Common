@@ -27,6 +27,14 @@ foreach(_flag IN ITEMS
     STRING(APPEND _CXX_FLAGS " ${_flag}")
 endforeach()
 
+if(NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.0.0)
+    foreach(_flag IN ITEMS
+        -Wno-misleading-indentation
+    )
+        STRING(APPEND _CXX_FLAGS " ${_flag}")
+    endforeach()
+endif()
+
 # Debug
 foreach(_flag IN ITEMS
     -DDEBUG
