@@ -107,7 +107,7 @@ class ExeSuite(unittest.TestCase):
                     if os.path.isfile(exe_name):
                         found = True
 
-                        result, output = Process.Execute("{} --success".format(exe_name))
+                        result, output = Process.Execute('"{}" --success'.format(exe_name))
                         self.assertTrue(
                             result == 0,
                             msg=output,
@@ -191,7 +191,7 @@ class SharedExeSuite(unittest.TestCase):
                     if os.path.isfile(exe_name):
                         found = True
 
-                        result, output = Process.Execute("{} --success".format(exe_name))
+                        result, output = Process.Execute('"{}" --success'.format(exe_name))
                         self.assertTrue(
                             result == 0,
                             msg=output,
