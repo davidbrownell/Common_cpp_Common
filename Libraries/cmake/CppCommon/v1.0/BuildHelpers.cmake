@@ -241,6 +241,11 @@ function(build_library)
         ${ARGN}
     )
 
+    # Do not attempt to build libraries more than once
+    if(TARGET ${BUILD_NAME})
+        return()
+    endif()
+
     # Validate required values
     _ValidateRequiredParams(
         BUILD_NAME
