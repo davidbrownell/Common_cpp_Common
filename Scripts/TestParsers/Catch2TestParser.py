@@ -92,13 +92,13 @@ class TestParser(TestParserImpl):
 _ExtractBenchmarkOutput_content_regex       = re.compile(
     textwrap.dedent(
         r"""(?#
-        Header          )\~+\r?\n(?#
+        Header          )\~~~~+\r?\n(?#
         Name            )(?P<name>[^\n]+)(?#
         text            ) is a Catch v(?#
         Version         )(?P<catch_version>[\d\.]+)(?#
         text            ) host application.\s+(?#
         Content         )(?P<content>.+?)(?#
-        Footer          )=+\r?\n(?#
+        Footer          )====+\r?\n(?#
         )""",
     ),
     re.DOTALL | re.MULTILINE,
@@ -109,9 +109,9 @@ _ExtractBenchmarkOutput_content_regex       = re.compile(
 _ExtractBenchmarkOutput_benchmarks_regex    = re.compile(
     textwrap.dedent(
         r"""(?#
-        Header 1        )-+\r?\n(?#
+        Header 1        )----+\r?\n(?#
         Test Name       )(?P<test_name>[^\r\n]+)\r?\n(?#
-        Header 2        )-+\r?\n(?#
+        Header 2        )----+\r?\n(?#
         Test Filename   )(?P<test_filename>[^\r\n]+)(?#
         Test line       )(?:(?#
             Windows     )\((?P<test_line_windows>\d+)\)(?#
@@ -120,7 +120,7 @@ _ExtractBenchmarkOutput_benchmarks_regex    = re.compile(
                         ))\r?\n(?#
         Header 3        )\.+\r?\n(?#
         Benchmark hdr   )\s+benchmark name\s+samples.+?(?#
-        Header 4        )-+\r?\n(?#
+        Header 4        )----+\r?\n(?#
         )""",
     ),
     re.DOTALL | re.MULTILINE,
