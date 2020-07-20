@@ -128,6 +128,14 @@ class Compiler(
             FileSystem.RemoveFile(fullpath)
 
     # ----------------------------------------------------------------------
+    @staticmethod
+    @Interface.override
+    def ExecuteExclusively(context):
+        # Don't allow the parallel execution of cmake files, as each of them
+        # internally will compile on all available threads.
+        return True
+
+    # ----------------------------------------------------------------------
     # ----------------------------------------------------------------------
     # ----------------------------------------------------------------------
     @classmethod
