@@ -83,4 +83,5 @@ class CodeCoverageExecutor(Interface.Interface):
     @staticmethod
     @Interface.abstractmethod
     def ExtractCoverageInfo(coverage_filename, binary_filename, includes, excludes, output_stream):
-        pass
+        """Returns (covered, not_covered)"""
+        raise Exception("Abstract method")
