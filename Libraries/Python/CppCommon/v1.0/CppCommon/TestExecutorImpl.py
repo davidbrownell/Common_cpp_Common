@@ -205,7 +205,7 @@ class TestExecutorImpl(TestExecutorImplBase):
                 result_blocks = covered + not_covered
 
                 all_percentages[output_name] = (
-                    (float(covered) / result_blocks if result_blocks else 0.0) * 100.0,
+                    None if not result_blocks else ((float(covered) / result_blocks) * 100.0),
                     "{} of {} {} covered".format(covered, result_blocks, code_coverage_executor.Units),
                 )
 
